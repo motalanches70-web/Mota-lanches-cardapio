@@ -262,12 +262,16 @@ function cartaoPedido(p, chegou) {
   if (p.status === "novo") botoes += `<button class="b-andamento" data-st="andamento" data-id="${p.id}">▶ Em andamento</button>`;
   if (p.status === "andamento") botoes += `<button class="b-finalizar" data-st="finalizado" data-id="${p.id}">✓ Finalizar</button>`;
   if (p.status === "novo" || p.status === "andamento") botoes += `<button class="b-cancelar" data-st="cancelado" data-id="${p.id}">Cancelar</button>`;
+  if (p.status !== "cancelado") botoes += p.pago
+    ? `<button class="b-despagar" data-pago="${p.id}" data-v="0">↩ Desmarcar pago</button>`
+    : `<button class="b-pago" data-pago="${p.id}" data-v="1">✅ Marcar como pago</button>`;
   botoes += `<a class="b-whats" target="_blank" href="${whats}">💬 Avisar cliente pelo WhatsApp</a>`;
   botoes += `<button class="b-print" data-imprimir="${p.id}" title="Imprimir comanda">🖨️</button>`;
   botoes += `<button class="b-excluir" data-excluir="${p.id}">Excluir</button>`;
   return `<div class="ped st-${p.status} ${chegou ? "chegou" : ""}" id="p-${p.id}">
     <div class="ped-topo"><span class="ped-num">#${p.numero}</span><span>${hora(p.criado_em)} · <strong>${p.tipo === "entrega" ? "🛵 ENTREGA" : "🏪 RETIRADA"}</strong></span></div>
     ${p.status === "cancelado" ? `<span class="selo-cancelado">CANCELADO</span>` : p.status === "finalizado" ? `<span class="selo-fim">FINALIZADO</span>` : ""}
+    ${p.status === "cancelado" ? "" : p.pago ? `<span class="selo-pago">✅ PAGO</span>` : String(p.pagamento) === "Pix" ? `<span class="selo-aguardando">⏳ PIX AGUARDANDO</span>` : ""}
     <div style="margin-top:4px"><strong>${esc(p.cliente_nome)}</strong> · ${esc(p.telefone)}</div>
     ${p.tipo === "entrega" ? `<div>📍 ${esc(p.endereco)} — ${esc(p.bairro)}${p.referencia ? ` <span class="dica">(${esc(p.referencia)})</span>` : ""}</div>` : ""}
     <ul>${p.itens.map(i => `<li><strong>${i.qtd}x</strong> ${i.codigo ? `<span class="cod">${esc(i.codigo)}</span> ` : ""}${esc(i.nome)} <span class="dica">${dinheiro(i.preco * i.qtd)}</span>
@@ -300,6 +304,16 @@ $("sec-pedidos").addEventListener("click", async e => {
   if (imp) {
     const el = $("p-" + imp.dataset.imprimir);
     el.classList.add("imprimindo"); try { window.print(); } catch (x) {} el.classList.remove("imprimindo");
+    return;
+  }
+  const pg = e.target.closest("[data-pago]");
+  if (pg) {
+    const valor = pg.dataset.v === "1";
+    pg.disabled = true;
+    const { error } = await banco.from("pedidos").update({ pago: valor, pago_em: valor ? new Date().toISOString() : null }).eq("id", pg.dataset.pago);
+    if (deuErro(error)) { pg.disabled = false; return; }
+    aviso(valor ? "Pedido marcado como pago ✅" : "Pagamento desmarcado");
+    carregarPedidos();
     return;
   }
   const ex = e.target.closest("[data-excluir]");
