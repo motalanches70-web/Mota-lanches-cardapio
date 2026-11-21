@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sua sacola | Mota Lanches</title>
+<meta name="theme-color" content="#0f0f0f">
+<meta property="og:image" content="https://motalanches70-web.github.io/Mota-lanches-cardapio/assets/img/banner.jpg">
+<link rel="icon" href="assets/img/icone.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/variables.css?v=20261121d">
+<link rel="stylesheet" href="assets/css/style.css?v=20261121d">
+</head>
+<body style="padding-bottom:20px">
+
+<header class="topo-mini" id="topoMini">
+  <div class="topo-mini-inner">
+    <a class="btn-voltar" href="index.html">← Cardápio</a>
+    <span class="marca-mini">MOTA LANCHES</span>
+    <a class="btn-sacola-mini" href="pedido.html">📋</a>
+  </div>
+</header>
+
+<div class="aviso-fechada escondido" id="avisoFechada"></div>
+
+<main class="pagina" id="paginaCarrinho">
+  <div class="pagina-cartao">
+    <h1>🛍️ Sua sacola</h1>
+    <div id="itensSacola"></div>
+
+    <div id="areaFinalizar">
+      <label>Como você quer receber?</label>
+      <div class="opcoes" id="opTipo">
+        <button class="opcao marcada" data-valor="entrega">🛵 Entrega</button>
+        <button class="opcao" data-valor="retirada">🏪 Retirar na loja</button>
+      </div>
+
+      <label for="nome">Seu nome</label>
+      <input class="campo" id="nome" maxlength="80" autocomplete="name">
+      <label for="telefone">Seu WhatsApp</label>
+      <input class="campo" id="telefone" type="tel" maxlength="20" placeholder="(16) 99999-9999" autocomplete="tel">
+
+      <div id="camposEntrega">
+        <div class="end-linha">
+          <div><label for="rua">Rua</label><input class="campo" id="rua" maxlength="150" autocomplete="address-line1" placeholder="Ex.: Rua das Flores"></div>
+          <div><label for="numero">Número</label><input class="campo" id="numero" maxlength="12" inputmode="numeric" placeholder="123"></div>
+        </div>
+        <label for="bairro">Bairro</label>
+        <input class="campo" id="bairro" maxlength="80" placeholder="Ex.: Centro">
+        <label for="referencia">Ponto de referência (opcional)</label>
+        <input class="campo" id="referencia" maxlength="200" placeholder="Ex.: casa azul, perto da padaria">
+        <div class="pix" id="avisoTaxa" style="margin-top:12px"></div>
+      </div>
+
+      <label>Forma de pagamento <span class="dica">(paga na entrega ou na retirada)</span></label>
+      <div class="opcoes tres" id="opPagamento">
+        <button class="opcao" data-valor="Pix">Pix</button>
+        <button class="opcao" data-valor="Dinheiro">Dinheiro</button>
+        <button class="opcao" data-valor="Cartão">Cartão</button>
+      </div>
+      <div id="campoCartao" class="escondido">
+        <label>Crédito ou débito?</label>
+        <div class="opcoes" id="opCartao">
+          <button class="opcao" data-valor="crédito">💳 Crédito</button>
+          <button class="opcao" data-valor="débito">💳 Débito</button>
+        </div>
+        <div class="pix" id="avisoMaquininha" style="margin-top:8px">🛵 O entregador leva a <strong>maquininha</strong> até você.</div>
+      </div>
+      <div id="campoTroco" class="escondido">
+        <label for="troco">Troco para quanto? (deixe vazio se não precisar)</label>
+        <input class="campo" id="troco" inputmode="decimal" placeholder="Ex.: 100">
+      </div>
+      <div id="campoPix" class="escondido"></div>
+      <div id="enderecoRetirada" class="escondido"></div>
+
+      <div id="blocoCupom" class="escondido">
+        <label for="cupom">Tem cupom de desconto?</label>
+        <div style="display:flex;gap:8px">
+          <input class="campo" id="cupom" maxlength="30" placeholder="Digite o código" style="text-transform:uppercase">
+          <button class="btn-sec" id="aplicarCupom" style="white-space:nowrap">Aplicar</button>
+        </div>
+        <p class="dica" id="msgCupom"></p>
+      </div>
+
+      <label for="obsGeral">Observação do pedido (opcional)</label>
+      <textarea class="campo" id="obsGeral" maxlength="300" placeholder="Ex.: tocar a campainha, mandar sachês..."></textarea>
+
+      <div class="resumo">
+        <div><span>Subtotal</span><span id="rSubtotal">R$ 0,00</span></div>
+        <div id="linhaCupom" class="escondido desconto"><span id="rCupomNome">Cupom</span><span id="rCupom"></span></div>
+        <div id="linhaPix" class="escondido desconto"><span id="rPixNome">Desconto no Pix</span><span id="rPix"></span></div>
+        <div id="linhaTaxa"><span>Entrega</span><span id="rTaxa">a combinar</span></div>
+        <div class="total"><span>Total</span><span id="rTotal">R$ 0,00</span></div>
+      </div>
+      <p class="erro" id="erroPedido"></p>
+      <button class="btn-principal" id="fazerPedido">Fazer pedido</button>
+    </div>
+  </div>
+</main>
+
+<footer id="rodape"></footer>
+
+<script src="assets/js/config.js?v=20261121d"></script>
+<script src="assets/js/cardapio.js?v=20261121d"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/comum.js?v=20261121d"></script>
+<script src="assets/js/cart.js?v=20261121d"></script>
+</body>
+</html>

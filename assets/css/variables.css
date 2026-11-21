@@ -1,0 +1,11 @@
+/* Mota Lanches — cores, fontes e medidas.
+   Para mudar uma cor do site inteiro, troque aqui. */
+:root{
+  --preto:#0f0f0f; --preto2:#1b1b1b; --preto3:#262626;
+  --amarelo:#ffc800; --amarelo2:#ffdb4d;
+  --branco:#ffffff; --cinza:#b8b8b8; --cinza2:#e9e9e9;
+  --verde:#25d366; --vermelho:#e5484d;
+  --raio:14px;
+  --fonte-titulo:"Bebas Neue","Poppins",sans-serif;
+  --fonte-texto:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}

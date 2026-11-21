@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lanche | Mota Lanches</title>
+<meta name="theme-color" content="#0f0f0f">
+<meta property="og:image" content="https://motalanches70-web.github.io/Mota-lanches-cardapio/assets/img/banner.jpg">
+<link rel="icon" href="assets/img/icone.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/variables.css?v=20261121d">
+<link rel="stylesheet" href="assets/css/style.css?v=20261121d">
+</head>
+<body style="padding-bottom:20px">
+
+<header class="topo-mini" id="topoMini">
+  <div class="topo-mini-inner">
+    <a class="btn-voltar" href="index.html">← Cardápio</a>
+    <span class="marca-mini">MOTA LANCHES</span>
+    <a class="btn-sacola-mini" href="carrinho.html">🛍️<span id="qtdTopo"></span></a>
+  </div>
+</header>
+
+<main class="pagina" id="paginaProduto">
+  <div class="pagina-cartao" id="conteudoProduto">
+    <img id="itemFoto" class="produto-foto escondido" alt="">
+    <div class="produto-selos" id="itemSelos"></div>
+    <h1 id="itemNome">Carregando...</h1>
+    <p class="desc" id="itemDesc"></p>
+    <div class="produto-preco" id="itemPreco"></div>
+
+    <!-- Abas: o cliente escolhe qual abrir -->
+    <div class="passos" id="passos">
+      <button id="passo1" data-etapa="1">Tirar ingredientes</button>
+      <button id="passo2" data-etapa="2">Adicionais</button>
+      <button id="passo3" data-etapa="3">Combina com</button>
+    </div>
+
+    <!-- ABA: tirar ingredientes -->
+    <div id="etapa1" class="escondido">
+      <h3 class="titulo-etapa">Quer tirar algum ingrediente?</h3>
+      <p class="dica">Toque no <strong>−</strong> para tirar. Para colocar de volta, toque no <strong>+</strong>.</p>
+      <div id="listaTirar" style="margin-top:12px"></div>
+    </div>
+
+    <!-- ABA: adicionais -->
+    <div id="etapa2" class="escondido">
+      <h3 class="titulo-etapa">Quer adicionar alguma coisa?</h3>
+      <p class="dica">Opcional. Toque no <strong>+</strong> para adicionar.</p>
+      <div id="listaAdd" style="margin-top:12px"></div>
+    </div>
+
+    <!-- ABA: combina com (batata, refrigerante...) -->
+    <div id="etapa3" class="escondido">
+      <h3 class="titulo-etapa">🍟🥤 Combina com</h3>
+      <p class="dica">Opcional. Quer levar uma batata ou um refri junto?</p>
+      <div id="listaCombina" style="margin-top:12px"></div>
+    </div>
+
+    <p class="sem-resumo" id="semResumo"></p>
+    <label for="itemObs">Alguma observação? (opcional)</label>
+    <textarea class="campo" id="itemObs" maxlength="140" placeholder="Ex.: bem passado, molho à parte..."></textarea>
+    <div class="contador">
+      <button id="menos" aria-label="Diminuir">−</button><span id="itemQtd">1</span><button id="mais" aria-label="Aumentar">+</button>
+    </div>
+    <button class="btn-principal" id="confirmarItem" disabled>Adicionar</button>
+  </div>
+</main>
+
+<footer id="rodape"></footer>
+
+<script src="assets/js/config.js?v=20261121d"></script>
+<script src="assets/js/cardapio.js?v=20261121d"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/comum.js?v=20261121d"></script>
+<script src="assets/js/cart.js?v=20261121d"></script>
+<script src="assets/js/catalog.js?v=20261121d"></script>
+</body>
+</html>
