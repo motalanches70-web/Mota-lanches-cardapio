@@ -169,3 +169,4 @@ footer#rodape a.rodape-politica{text-decoration:underline;text-underline-offset:
 .end-linha{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:10px}
 
 .pago-ok{margin-top:10px;background:rgba(37,211,102,.12);border:1px solid var(--verde);color:#8fe3a9;font-weight:800;padding:10px 12px;border-radius:12px}
+.pago-espera{margin-top:10px;background:rgba(255,179,92,.12);border:1px solid #ffb35c;color:#ffcf96;font-weight:800;padding:10px 12px;border-radius:12px}

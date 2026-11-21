@@ -47,7 +47,9 @@ async function mostrarPedido() {
             <li class="${n <= pos ? "feita" : ""} ${n === pos ? "atual" : ""}">
               <span class="bola">${n < pos ? "✓" : n + 1}</span>${nomes[e]}
             </li>`).join("")}</ul>`}
-      ${p.pago && p.status !== "cancelado" ? `<p class="pago-ok">✅ Pagamento confirmado pela loja</p>` : ""}
+      ${p.status === "cancelado" ? "" : p.pagamento === "Pix"
+        ? (p.pago ? `<p class="pago-ok">✅ Pix concluído</p>` : `<p class="pago-espera">⏳ Aguardando Pix</p>`)
+        : (p.pago ? `<p class="pago-ok">✅ Pagamento confirmado pela loja</p>` : "")}
       <p class="dica" style="margin-top:8px">Esta página se atualiza sozinha.</p>
     </div>
     ${msgPedido && p.status !== "cancelado" ? `<a class="btn-whats" target="_blank" href="${linkWhats(msgPedido, whats)}">📲 Enviar pedido também no WhatsApp da loja</a>` : ""}

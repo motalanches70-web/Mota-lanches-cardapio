@@ -247,6 +247,10 @@ async function carregarPedidos() {
 
 function mensagemCliente(p) {
   const nome = p.cliente_nome.split(" ")[0];
+  const pix = String(p.pagamento) === "Pix" && p.status !== "cancelado" ? (p.pago ? " ✅ Pix concluído." : " ⏳ Aguardando o Pix.") : "";
+  return mensagemBase(p, nome) + pix;
+}
+function mensagemBase(p, nome) {
   if (p.status === "novo") return `Olá, ${nome}! Recebemos seu pedido #${p.numero} na Mota Lanches. Total: ${dinheiro(p.total)}. Já já começamos a preparar! 🍔`;
   if (p.status === "andamento") return `Olá, ${nome}! Seu pedido #${p.numero} está sendo preparado. 🍔🔥`;
   if (p.status === "finalizado") return p.tipo === "entrega"
@@ -262,16 +266,19 @@ function cartaoPedido(p, chegou) {
   if (p.status === "novo") botoes += `<button class="b-andamento" data-st="andamento" data-id="${p.id}">▶ Em andamento</button>`;
   if (p.status === "andamento") botoes += `<button class="b-finalizar" data-st="finalizado" data-id="${p.id}">✓ Finalizar</button>`;
   if (p.status === "novo" || p.status === "andamento") botoes += `<button class="b-cancelar" data-st="cancelado" data-id="${p.id}">Cancelar</button>`;
+  const ehPix = String(p.pagamento) === "Pix";
   if (p.status !== "cancelado") botoes += p.pago
-    ? `<button class="b-despagar" data-pago="${p.id}" data-v="0">↩ Desmarcar pago</button>`
-    : `<button class="b-pago" data-pago="${p.id}" data-v="1">✅ Marcar como pago</button>`;
+    ? `<button class="b-despagar" data-pago="${p.id}" data-v="0">↩ ${ehPix ? "Voltar para aguardando Pix" : "Desmarcar pago"}</button>`
+    : `<button class="b-pago" data-pago="${p.id}" data-v="1">✅ ${ehPix ? "Pix concluído" : "Marcar como pago"}</button>`;
   botoes += `<a class="b-whats" target="_blank" href="${whats}">💬 Avisar cliente pelo WhatsApp</a>`;
   botoes += `<button class="b-print" data-imprimir="${p.id}" title="Imprimir comanda">🖨️</button>`;
   botoes += `<button class="b-excluir" data-excluir="${p.id}">Excluir</button>`;
   return `<div class="ped st-${p.status} ${chegou ? "chegou" : ""}" id="p-${p.id}">
     <div class="ped-topo"><span class="ped-num">#${p.numero}</span><span>${hora(p.criado_em)} · <strong>${p.tipo === "entrega" ? "🛵 ENTREGA" : "🏪 RETIRADA"}</strong></span></div>
     ${p.status === "cancelado" ? `<span class="selo-cancelado">CANCELADO</span>` : p.status === "finalizado" ? `<span class="selo-fim">FINALIZADO</span>` : ""}
-    ${p.status === "cancelado" ? "" : p.pago ? `<span class="selo-pago">✅ PAGO</span>` : String(p.pagamento) === "Pix" ? `<span class="selo-aguardando">⏳ PIX AGUARDANDO</span>` : ""}
+    ${p.status === "cancelado" ? "" : String(p.pagamento) === "Pix"
+      ? (p.pago ? `<span class="selo-pago">✅ PIX CONCLUÍDO</span>` : `<span class="selo-aguardando">⏳ AGUARDANDO PIX</span>`)
+      : (p.pago ? `<span class="selo-pago">✅ PAGO</span>` : "")}
     <div style="margin-top:4px"><strong>${esc(p.cliente_nome)}</strong> · ${esc(p.telefone)}</div>
     ${p.tipo === "entrega" ? `<div>📍 ${esc(p.endereco)} — ${esc(p.bairro)}${p.referencia ? ` <span class="dica">(${esc(p.referencia)})</span>` : ""}</div>` : ""}
     <ul>${p.itens.map(i => `<li><strong>${i.qtd}x</strong> ${i.codigo ? `<span class="cod">${esc(i.codigo)}</span> ` : ""}${esc(i.nome)} <span class="dica">${dinheiro(i.preco * i.qtd)}</span>
@@ -312,7 +319,9 @@ $("sec-pedidos").addEventListener("click", async e => {
     pg.disabled = true;
     const { error } = await banco.from("pedidos").update({ pago: valor, pago_em: valor ? new Date().toISOString() : null }).eq("id", pg.dataset.pago);
     if (deuErro(error)) { pg.disabled = false; return; }
-    aviso(valor ? "Pedido marcado como pago ✅" : "Pagamento desmarcado");
+    const pd = pedidos.find(x => x.id === pg.dataset.pago);
+    const pix = pd && String(pd.pagamento) === "Pix";
+    aviso(valor ? (pix ? "✅ Pix concluído" : "Pedido marcado como pago ✅") : (pix ? "⏳ Voltou para aguardando Pix" : "Pagamento desmarcado"));
     carregarPedidos();
     return;
   }
