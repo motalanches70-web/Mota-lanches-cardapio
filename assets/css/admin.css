@@ -186,3 +186,7 @@ body{padding-bottom:30px}
 .selo-aguardando{display:inline-block;background:#ffb35c;color:#3a2000;font-weight:800;padding:3px 10px;border-radius:99px;font-size:13px;margin-left:4px}
 .b-pago{background:var(--verde);color:#062b14}
 .b-despagar{background:var(--preto3);color:#ccc}
+
+/* Botões do Pix no pedido */
+.acoes .b-enviar-pix{background:#32bcad;color:#04201d}
+.acoes .b-copiar-pix{background:var(--preto3);color:#fff;border:1px dashed #32bcad}

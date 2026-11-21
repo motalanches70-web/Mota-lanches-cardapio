@@ -271,6 +271,16 @@ function cartaoPedido(p, chegou) {
     ? `<button class="b-despagar" data-pago="${p.id}" data-v="0">↩ ${ehPix ? "Voltar para aguardando Pix" : "Desmarcar pago"}</button>`
     : `<button class="b-pago" data-pago="${p.id}" data-v="1">✅ ${ehPix ? "Pix concluído" : "Marcar como pago"}</button>`;
   botoes += `<a class="b-whats" target="_blank" href="${whats}">💬 Avisar cliente pelo WhatsApp</a>`;
+  // Pix ainda não pago: botões para mandar a chave/código Pix ao cliente
+  const codPix = ehPix && !p.pago && p.status !== "cancelado" ? pixCopiaCola(Object.assign({ pix_nome: "", pix_cidade: "" }, cfg), Number(p.total), "MOTA" + p.numero) : "";
+  if (codPix) {
+    const nome = esc(p.cliente_nome.split(" ")[0]);
+    const msgPix = `Olá, ${p.cliente_nome.split(" ")[0]}! Segue o Pix do seu pedido #${p.numero} na Mota Lanches.\n\n` +
+      `Valor: *${dinheiro(p.total)}*\nChave Pix: ${cfg.chave_pix}${cfg.pix_nome ? "\nNome: " + cfg.pix_nome : ""}\n\n` +
+      `Ou use o *Pix copia e cola* (copie o código abaixo e cole no app do banco):\n\n${codPix}`;
+    botoes += `<a class="b-whats b-enviar-pix" target="_blank" href="https://wa.me/${tel.startsWith("55") ? tel : "55" + tel}?text=${encodeURIComponent(msgPix)}">💠 Enviar Pix para ${nome}</a>`;
+    botoes += `<button class="b-copiar-pix btn-copiar-pix" data-codigo="${esc(codPix)}">📋 Copiar código Pix</button>`;
+  }
   botoes += `<button class="b-print" data-imprimir="${p.id}" title="Imprimir comanda">🖨️</button>`;
   botoes += `<button class="b-excluir" data-excluir="${p.id}">Excluir</button>`;
   return `<div class="ped st-${p.status} ${chegou ? "chegou" : ""}" id="p-${p.id}">

@@ -155,11 +155,22 @@ if ($("paginaCarrinho")) {
     $("avisoMaquininha").classList.toggle("escondido", tipo !== "entrega");
     const pix = $("campoPix"), chave = D.cfg.chave_pix;
     pix.classList.toggle("escondido", pagamento !== "Pix" || !chave);
-    pix.innerHTML = chave ? `<div class="pix">Chave Pix: <strong>${esc(chave)}</strong><br><span class="dica">Depois de fazer o pedido aparece o <strong>Pix copia e cola</strong> com o valor certinho. Pode pagar na hora ou na entrega.</span></div>` : "";
+    pix.innerHTML = chave ? `<div class="pix pix-chave"><span>Chave Pix: <strong>${esc(chave)}</strong></span>
+      <button class="btn-sec" id="copiarChave" type="button">📋 Copiar</button></div>` : "";
     const ret = $("enderecoRetirada");
     ret.classList.toggle("escondido", tipo !== "retirada" || !D.cfg.endereco);
     ret.innerHTML = D.cfg.endereco ? `<div class="pix">📍 Retire em: <strong>${esc(D.cfg.endereco)}</strong></div>` : "";
   }
+
+  // copia a chave Pix (telefone, CPF e CNPJ vão só com os números)
+  $("campoPix").addEventListener("click", async e => {
+    const b = e.target.closest("#copiarChave"); if (!b) return;
+    let k = String(D.cfg.chave_pix).trim();
+    if (["telefone", "cpf", "cnpj"].includes(D.cfg.pix_tipo)) k = k.replace(/\D/g, "");
+    const ok = await copiarTexto(k);
+    b.textContent = ok ? "✅ Copiada!" : "Copie a chave acima";
+    setTimeout(() => b.textContent = "📋 Copiar", 2500);
+  });
 
   function escolha(grupo, cb) {
     $(grupo).addEventListener("click", e => {

@@ -1,4 +1,16 @@
 /* Estilo do site (as cores ficam em variables.css) */
+/* Reserva: se o variables.css não carregar, o site usa estas cores.
+   (Para mudar as cores, edite o variables.css — ele tem prioridade.) */
+:where(html){
+  --preto:#0f0f0f; --preto2:#1b1b1b; --preto3:#262626;
+  --amarelo:#ffc800; --amarelo2:#ffdb4d;
+  --branco:#ffffff; --cinza:#b8b8b8; --cinza2:#e9e9e9;
+  --verde:#25d366; --vermelho:#e5484d;
+  --raio:14px;
+  --fonte-titulo:"Bebas Neue","Poppins",sans-serif;
+  --fonte-texto:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;scroll-padding-top:120px}
 body{font-family:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--preto);color:var(--branco);line-height:1.4;padding-bottom:96px}
@@ -184,3 +196,6 @@ footer#rodape a.rodape-politica{text-decoration:underline;text-underline-offset:
 .item{cursor:pointer}
 .aviso-add{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--verde);color:#062b14;font-weight:800;padding:11px 18px;border-radius:99px;z-index:50;box-shadow:0 6px 20px rgba(0,0,0,.4);white-space:nowrap;transition:opacity .3s}
 .barra-sacola a{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:640px;margin:0 auto;background:var(--amarelo);color:var(--preto);font-weight:800;padding:15px 18px;border-radius:16px;font-size:16px;box-shadow:0 6px 24px rgba(255,200,0,.3);text-decoration:none}
+.pix-chave{display:flex;align-items:center;justify-content:space-between;gap:10px;word-break:normal}
+.pix-chave strong{word-break:break-all}
+.pix-chave .btn-sec{white-space:nowrap;flex-shrink:0}
