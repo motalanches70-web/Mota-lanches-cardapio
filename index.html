@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mota Lanches | Cardápio e pedidos</title>
+<meta name="description" content="Fome? É na Mota Lanches. Peça seu lanche pelo celular.">
+<meta name="theme-color" content="#0f0f0f">
+<link rel="icon" href="assets/img/icone.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-acoes"><a class="btn-meus" href="pedido.html">📋 Meus pedidos</a><a class="btn-painel" href="admin.html">🔐 Painel</a></div>
+  <div class="topo-inner">
+    <img src="assets/img/mascote.png" alt="Mascote da Mota Lanches">
+    <div>
+      <div class="marca">MOTA<br>LANCHES</div>
+      <div class="slogan" id="slogan">Fome? É na Mota Lanches.</div>
+      <div class="frase">Aqui é qualidade e muito sabor!</div>
+      <div class="status-loja" id="statusLoja">Aberto para pedidos</div>
+      <div class="dica" id="horarioLoja"></div>
+    </div>
+  </div>
+</header>
+
+<div class="aviso-fechada escondido" id="avisoFechada">
+  Estamos fechados agora. Você pode olhar o cardápio, mas os pedidos voltam quando abrirmos.
+</div>
+
+<nav class="cats" id="categorias"></nav>
+
+<div class="busca">
+  <input type="search" id="busca" placeholder="🔎 Buscar lanche (ex.: bacon, frango, batata)">
+</div>
+
+<main id="cardapio"><p class="vazio">Carregando cardápio...</p></main>
+
+<footer id="rodape"></footer>
+
+<!-- Barra da sacola -->
+<div class="barra-sacola escondido" id="barraSacola">
+  <button id="abrirSacola"><span>🛍️ Ver sacola (<span id="qtdSacola">0</span>)</span><span id="totalBarra">R$ 0,00</span></button>
+</div>
+
+<!-- Janela: adicionar item -->
+<div class="fundo escondido" id="janelaItem">
+  <div class="janela">
+    <img id="itemFoto" class="janela-foto escondido" alt="">
+    <div class="janela-topo">
+      <div><h2 id="itemNome"></h2><p class="desc" id="itemDesc"></p></div>
+      <button class="fechar" data-fechar="janelaItem" aria-label="Fechar">×</button>
+    </div>
+    <!-- Abas: o cliente escolhe qual abrir -->
+    <div class="passos" id="passos">
+      <button id="passo1" data-etapa="1">Tirar ingredientes</button>
+      <button id="passo2" data-etapa="2">Adicionais</button>
+      <button id="passo3" data-etapa="3">Combina com</button>
+    </div>
+
+    <!-- ABA: tirar ingredientes -->
+    <div id="etapa1">
+      <h3 class="titulo-etapa">Quer tirar algum ingrediente?</h3>
+      <p class="dica">Toque no <strong>−</strong> para tirar. Para colocar de volta, toque no <strong>+</strong>.</p>
+      <div id="listaTirar" style="margin-top:12px"></div>
+    </div>
+
+    <!-- ABA: adicionais -->
+    <div id="etapa2">
+      <h3 class="titulo-etapa">Quer adicionar alguma coisa?</h3>
+      <p class="dica">Opcional. Toque no <strong>+</strong> para adicionar.</p>
+      <div id="listaAdd" style="margin-top:12px"></div>
+    </div>
+
+    <!-- ABA: combina com (batata, refrigerante...) -->
+    <div id="etapa3">
+      <h3 class="titulo-etapa">🍟🥤 Combina com</h3>
+      <p class="dica">Opcional. Quer levar uma batata ou um refri junto?</p>
+      <div id="listaCombina" style="margin-top:12px"></div>
+    </div>
+
+    <!-- Parte de baixo (aparece em todas as abas) -->
+    <p class="sem-resumo" id="semResumo"></p>
+    <label for="itemObs">Alguma observação? (opcional)</label>
+    <textarea class="campo" id="itemObs" maxlength="140" placeholder="Ex.: bem passado, molho à parte..."></textarea>
+    <div class="contador">
+      <button id="menos" aria-label="Diminuir">−</button><span id="itemQtd">1</span><button id="mais" aria-label="Aumentar">+</button>
+    </div>
+    <button class="btn-principal" id="confirmarItem">Adicionar · R$ 0,00</button>
+  </div>
+</div>
+
+<!-- Janela: sacola e finalização -->
+<div class="fundo escondido" id="janelaSacola">
+  <div class="janela">
+    <div class="janela-topo">
+      <h2>Sua sacola</h2>
+      <button class="fechar" data-fechar="janelaSacola" aria-label="Fechar">×</button>
+    </div>
+    <div id="itensSacola"></div>
+
+    <div id="areaFinalizar">
+      <label>Como você quer receber?</label>
+      <div class="opcoes" id="opTipo">
+        <button class="opcao marcada" data-valor="entrega">🛵 Entrega</button>
+        <button class="opcao" data-valor="retirada">🏪 Retirar na loja</button>
+      </div>
+
+      <label for="nome">Seu nome</label>
+      <input class="campo" id="nome" maxlength="80" autocomplete="name">
+      <label for="telefone">Seu WhatsApp</label>
+      <input class="campo" id="telefone" type="tel" maxlength="20" placeholder="(16) 99999-9999" autocomplete="tel">
+
+      <div id="camposEntrega">
+        <div class="end-linha">
+          <div><label for="rua">Rua</label><input class="campo" id="rua" maxlength="150" autocomplete="address-line1" placeholder="Ex.: Rua das Flores"></div>
+          <div><label for="numero">Número</label><input class="campo" id="numero" maxlength="12" inputmode="numeric" placeholder="123"></div>
+        </div>
+        <label for="bairro">Bairro</label>
+        <input class="campo" id="bairro" maxlength="80" placeholder="Ex.: Centro">
+        <label for="referencia">Ponto de referência (opcional)</label>
+        <input class="campo" id="referencia" maxlength="200" placeholder="Ex.: casa azul, perto da padaria">
+        <div class="pix" id="avisoTaxa" style="margin-top:12px"></div>
+      </div>
+
+      <label>Forma de pagamento <span class="dica">(paga na entrega ou na retirada)</span></label>
+      <div class="opcoes tres" id="opPagamento">
+        <button class="opcao" data-valor="Pix">Pix</button>
+        <button class="opcao" data-valor="Dinheiro">Dinheiro</button>
+        <button class="opcao" data-valor="Cartão">Cartão</button>
+      </div>
+      <div id="campoCartao" class="escondido">
+        <label>Crédito ou débito?</label>
+        <div class="opcoes" id="opCartao">
+          <button class="opcao" data-valor="crédito">💳 Crédito</button>
+          <button class="opcao" data-valor="débito">💳 Débito</button>
+        </div>
+        <div class="pix" id="avisoMaquininha" style="margin-top:8px">🛵 O entregador leva a <strong>maquininha</strong> até você.</div>
+      </div>
+      <div id="campoTroco" class="escondido">
+        <label for="troco">Troco para quanto? (deixe vazio se não precisar)</label>
+        <input class="campo" id="troco" inputmode="decimal" placeholder="Ex.: 100">
+      </div>
+      <div id="campoPix" class="escondido"></div>
+      <div id="enderecoRetirada" class="escondido"></div>
+
+      <div id="blocoCupom" class="escondido">
+        <label for="cupom">Tem cupom de desconto?</label>
+        <div style="display:flex;gap:8px">
+          <input class="campo" id="cupom" maxlength="30" placeholder="Digite o código" style="text-transform:uppercase">
+          <button class="btn-sec" id="aplicarCupom" style="white-space:nowrap">Aplicar</button>
+        </div>
+        <p class="dica" id="msgCupom"></p>
+      </div>
+
+      <label for="obsGeral">Observação do pedido (opcional)</label>
+      <textarea class="campo" id="obsGeral" maxlength="300" placeholder="Ex.: tocar a campainha, mandar sachês..."></textarea>
+
+      <div class="resumo">
+        <div><span>Subtotal</span><span id="rSubtotal">R$ 0,00</span></div>
+        <div id="linhaCupom" class="escondido desconto"><span id="rCupomNome">Cupom</span><span id="rCupom"></span></div>
+        <div id="linhaPix" class="escondido desconto"><span id="rPixNome">Desconto no Pix</span><span id="rPix"></span></div>
+        <div id="linhaTaxa"><span>Entrega</span><span id="rTaxa">a combinar</span></div>
+        <div class="total"><span>Total</span><span id="rTotal">R$ 0,00</span></div>
+      </div>
+      <p class="erro" id="erroPedido"></p>
+      <button class="btn-principal" id="fazerPedido">Fazer pedido</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/cardapio.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/comum.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

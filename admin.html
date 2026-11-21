@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Painel | Mota Lanches</title>
+<meta name="theme-color" content="#0f0f0f">
+<link rel="icon" href="assets/img/icone.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+<header class="topo" style="padding:14px 18px">
+  <div class="topo-inner">
+    <img src="assets/img/icone.png" alt="" style="width:56px;height:56px;border-radius:50%">
+    <div style="flex:1"><div class="marca" style="font-size:30px">PAINEL MOTA LANCHES</div></div>
+  </div>
+</header>
+
+<!-- Login -->
+<div class="login escondido" id="telaLogin">
+  <div class="cartao">
+    <h2 style="color:var(--amarelo)">Entrar no painel</h2>
+    <label for="email">E-mail</label>
+    <input class="campo" id="email" type="email" autocomplete="username">
+    <label for="senha">Senha</label>
+    <input class="campo" id="senha" type="password" autocomplete="current-password">
+    <p class="erro" id="erroLogin"></p>
+    <button class="btn-principal" id="entrar">Entrar</button>
+    <a class="btn-sec" href="index.html" style="display:block;text-align:center;text-decoration:none;margin-top:10px">← Voltar à loja</a>
+  </div>
+</div>
+
+<div class="login escondido" id="semConfig">
+  <div class="cartao"><p>O painel ainda não foi ligado ao Supabase. Preencha o arquivo <strong>assets/js/config.js</strong>.</p></div>
+</div>
+
+<!-- Painel -->
+<div class="escondido" id="telaPainel">
+  <div class="barra-adm">
+    <label class="chave"><input type="checkbox" id="chaveLoja"><span id="textoLoja">Loja aberta</span></label>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a class="btn-sec" href="index.html" style="text-decoration:none">← Voltar à loja</a>
+      <button class="btn-sec" id="somLiga">🔔 Som ligado</button>
+      <button class="btn-sec" id="sair">Sair</button>
+    </div>
+  </div>
+
+  <button class="aviso-som escondido" id="avisoSom">🔊 Toque aqui para ativar o som dos pedidos</button>
+  <div class="faixa-alarme escondido" id="faixaAlarme">
+    <span>🔔 <strong id="qtdNovosFaixa">Pedido novo esperando</strong></span>
+    <button class="btn-sec" id="verNovos">Ver pedido</button>
+  </div>
+  <nav class="menu-adm" id="menu">
+    <button data-sec="pedidos" class="ativa">📋 Pedidos<span class="n escondido" id="nNovos"></span></button>
+    <button data-sec="relatorios">📊 Relatórios</button>
+    <button data-sec="cardapio">🍔 Cardápio<span class="n escondido" id="nBaixo"></span></button>
+    <button data-sec="estoque">📦 Estoque<span class="n escondido" id="nEstoque"></span></button>
+    <button data-sec="promocoes">🏷️ Promoções</button>
+    <button data-sec="combos">🧰 Combos</button>
+    <button data-sec="config">⚙️ Configurações</button>
+  </nav>
+
+  <!-- PEDIDOS -->
+  <section class="sec" id="sec-pedidos">
+    <div class="colunas">
+      <div class="coluna"><h3 class="col-titulo novo">Novos <span id="cNovo">0</span></h3><div id="colNovo"></div></div>
+      <div class="coluna"><h3 class="col-titulo andamento">Em andamento <span id="cAndamento">0</span></h3><div id="colAndamento"></div></div>
+      <div class="coluna"><h3 class="col-titulo fim">Finalizados <span class="dica">(últimas 24h)</span> <span id="cFim">0</span></h3><div id="colFim"></div></div>
+    </div>
+    <p class="dica" style="text-align:center;margin-top:14px">Atualiza sozinho a cada 15 segundos · <span id="horaAtualizacao"></span></p>
+  </section>
+
+  <!-- RELATÓRIOS -->
+  <section class="sec escondido" id="sec-relatorios">
+    <div class="bloco">
+      <div class="linha-form">
+        <select class="campo" id="relPeriodo" style="max-width:220px">
+          <option value="hoje">Hoje</option>
+          <option value="ontem">Ontem</option>
+          <option value="7">Últimos 7 dias</option>
+          <option value="30">Últimos 30 dias</option>
+          <option value="mes">Este mês</option>
+          <option value="custom">Escolher datas</option>
+        </select>
+        <span id="relDatas" class="escondido" style="display:flex;gap:6px;align-items:center">
+          <input class="campo" type="date" id="relDe"> até <input class="campo" type="date" id="relAte">
+        </span>
+        <button class="btn-principal curto" id="relGerar">Ver relatório</button>
+        <button class="btn-sec" id="relCsv">⬇️ Baixar CSV (Excel)</button>
+      </div>
+    </div>
+    <div id="relResultado"></div>
+  </section>
+
+  <!-- CARDÁPIO -->
+  <section class="sec escondido" id="sec-cardapio">
+    <div class="bloco">
+      <div class="linha-form" style="margin-top:0">
+        <button class="btn-principal curto" id="btnNovoProduto">+ Novo produto</button>
+      </div>
+      <div id="alertaEstoque"></div>
+    </div>
+
+    <div class="bloco">
+      <h3 class="titulo-serif">Categorias</h3>
+      <div id="listaCats"></div>
+      <div class="linha-form">
+        <input class="campo" id="novaCat" placeholder="Nova categoria (ex.: Pastéis)">
+        <button class="btn-principal curto" id="addCat">Adicionar</button>
+      </div>
+    </div>
+
+    <div class="bloco">
+      <h3 class="titulo-serif">Produtos (<span id="nProdutos">0</span>)</h3>
+      <input class="campo" id="buscaProd" placeholder="🔎 Procurar item (nome ou código)" style="margin-top:8px">
+      <div id="listaProdutos"></div>
+    </div>
+
+    <div class="bloco">
+      <h3 class="titulo-serif">Adicionais</h3>
+      <p class="dica">Aparecem na aba "Adicionais" dos lanches.</p>
+      <div id="listaAdicionais"></div>
+      <div class="linha-form" style="margin-top:10px">
+        <input class="campo" id="naNome" placeholder="Nome (ex.: Cebola)">
+        <input class="campo" id="naPreco" placeholder="Preço" inputmode="decimal" style="max-width:120px">
+        <button class="btn-principal curto" id="naSalvar">+ Adicionar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Janela: novo / editar produto -->
+  <div class="fundo escondido" id="janelaProduto">
+    <div class="janela" style="max-width:720px">
+      <div class="janela-topo">
+        <h2 id="jpTitulo">Novo produto</h2>
+        <button class="fechar" id="jpFechar" aria-label="Fechar">×</button>
+      </div>
+      <div class="foto-edit">
+        <div class="foto-prev" id="jpFotoPrev">🍔</div>
+        <div>
+          <label class="btn-sec" style="display:inline-block;margin:0;cursor:pointer">📷 Escolher foto<input type="file" id="jpFoto" accept="image/*" hidden></label>
+          <button class="btn-sec escondido" id="jpTirarFoto">Tirar foto</button>
+          <p class="dica">A foto é diminuída sozinha para o site ficar rápido.</p>
+        </div>
+      </div>
+      <div class="grade-form">
+        <div><label>Nome</label><input class="campo" id="jpNome"></div>
+        <div><label>Categoria</label><select class="campo" id="jpCategoria"></select></div>
+        <div class="largo"><label>Ingredientes / descrição <span class="dica">(separe com vírgula — viram os botões de "tirar ingredientes")</span></label><textarea class="campo" id="jpDesc" rows="2"></textarea></div>
+        <div><label>Preço (R$)</label><input class="campo" id="jpPreco" inputmode="decimal"></div>
+        <div><label>Preço de oferta (R$) <span class="dica">(opcional)</span></label><input class="campo" id="jpOferta" inputmode="decimal"></div>
+        <div><label>Código <span class="dica">(opcional)</span></label><input class="campo" id="jpCodigo" maxlength="30" placeholder="Ex.: 101"></div>
+        <div></div>
+        <div class="largo">
+          <label class="check"><input type="checkbox" id="jpOpcoes"> Mostrar "tirar ingredientes" e "adicionais"</label>
+          <label class="check"><input type="checkbox" id="jpAtivo"> Mostrar no site</label>
+          <label class="check"><input type="checkbox" id="jpFalta"> Em falta</label>
+          <label class="check"><input type="checkbox" id="jpTop"> ⭐ Mais vendido</label>
+          <label class="check"><input type="checkbox" id="jpCombina"> 🍟 Oferecer em "Combina com" (aparece como opcional junto dos lanches)</label>
+        </div>
+      </div>
+      <p class="erro" id="jpErro"></p>
+      <button class="btn-principal" id="jpSalvar">Salvar</button>
+    </div>
+  </div>
+
+  <!-- ESTOQUE DE INGREDIENTES -->
+  <section class="sec escondido" id="sec-estoque">
+    <div class="bloco">
+      <h3 class="titulo-serif">📦 Estoque de ingredientes</h3>
+      <p class="dica" style="margin-top:6px">Anote quanto tem de cada ingrediente. Em <strong>"Avisar quando ficar em"</strong>, coloque a quantidade em que o painel deve avisar que está acabando. Deixe vazio para não avisar.</p>
+      <div id="alertaIngr"></div>
+    </div>
+    <div class="bloco">
+      <h3 class="titulo-serif">Ingredientes (<span id="nIngr">0</span>)</h3>
+      <input class="campo" id="buscaIngr" placeholder="🔎 Procurar ingrediente" style="margin-top:8px">
+      <div id="listaIngr"></div>
+      <p style="margin-top:18px;font-weight:800">Novo ingrediente</p>
+      <div class="linha-form" style="margin-top:6px">
+        <input class="campo" id="niNome" placeholder="Ex.: Cebola">
+        <select class="campo" id="niUnidade" style="max-width:120px;flex:0 0 auto"></select>
+        <button class="btn-principal curto" id="niSalvar">+ Adicionar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMOÇÕES -->
+  <section class="sec escondido" id="sec-promocoes">
+    <div class="bloco">
+      <h3>💚 Desconto no Pix</h3>
+      <p class="dica">Desconto automático quando o cliente escolhe Pix. Use 0 para não dar desconto.</p>
+      <div class="linha-form">
+        <input class="campo" id="descPix" inputmode="decimal" style="max-width:120px"> <span>%</span>
+        <button class="btn-principal curto" id="salvarPix">Salvar</button>
+      </div>
+    </div>
+    <div class="bloco">
+      <h3>🎟️ Cupons</h3>
+      <div class="linha-form">
+        <input class="campo" id="ncCodigo" placeholder="Código (ex.: MOTA10)" style="text-transform:uppercase">
+        <input class="campo" id="ncPct" placeholder="%" inputmode="decimal" style="max-width:90px">
+        <button class="btn-principal curto" id="ncSalvar">+ Criar cupom</button>
+      </div>
+      <p class="erro" id="ncErro"></p>
+      <div id="listaCupons"></div>
+    </div>
+    <div class="bloco">
+      <h3>🔥 Preço de oferta</h3>
+      <p class="dica">O item aparece no site com o preço antigo riscado e o selo OFERTA.</p>
+      <div class="linha-form">
+        <select class="campo" id="ofProduto"></select>
+        <input class="campo" id="ofPreco" placeholder="Preço de oferta" inputmode="decimal" style="max-width:150px">
+        <button class="btn-principal curto" id="ofSalvar">Colocar em oferta</button>
+      </div>
+      <p class="erro" id="ofErro"></p>
+      <div id="listaOfertas"></div>
+    </div>
+  </section>
+
+  <!-- COMBOS -->
+  <section class="sec escondido" id="sec-combos">
+    <div class="bloco">
+      <h3 id="cbTitulo">Novo combo</h3>
+      <div class="grade-form">
+        <div><label>Nome do combo</label><input class="campo" id="cbNome" placeholder="Ex.: Casal"></div>
+        <div><label>Preço do combo (R$)</label><input class="campo" id="cbPreco" inputmode="decimal"></div>
+        <div class="largo"><label>Descrição <span class="dica">(opcional — se deixar vazio, o site mostra os itens)</span></label><input class="campo" id="cbDesc"></div>
+      </div>
+      <label>Itens do combo</label>
+      <div id="cbItens"></div>
+      <div class="linha-form">
+        <select class="campo" id="cbProduto"></select>
+        <input class="campo" id="cbQtd" value="1" inputmode="numeric" style="max-width:70px">
+        <button class="btn-sec" id="cbAddItem">+ Pôr no combo</button>
+      </div>
+      <p class="dica" id="cbSomaItens"></p>
+      <p class="erro" id="cbErro"></p>
+      <div class="linha-form">
+        <button class="btn-principal curto" id="cbSalvar">Salvar combo</button>
+        <button class="btn-sec escondido" id="cbCancelar">Cancelar edição</button>
+      </div>
+    </div>
+    <div id="listaCombos"></div>
+  </section>
+
+  <!-- CONFIGURAÇÕES -->
+  <section class="sec escondido" id="sec-config">
+    <div class="bloco">
+      <h3 class="titulo-serif">🔢 Numeração dos pedidos</h3>
+      <p style="margin-top:6px">O número de cada pedido é dado pelo <strong>sistema da loja</strong>, em ordem, o mesmo para todos os clientes. Dois pedidos nunca recebem o mesmo número.</p>
+      <div class="linha-info"><span>Próximo pedido</span><strong id="cfProximo">Nº 01</strong></div>
+      <button class="btn-principal curto" id="cfRecomecar">↺ Recomeçar a numeração do 01</button>
+      <p class="dica" style="margin-top:8px">Para recomeçar do Nº 01, a lista de pedidos precisa estar vazia: cancele e exclua todos os pedidos na aba 📋 Pedidos antes.</p>
+    </div>
+
+    <div class="bloco">
+      <h3 class="titulo-serif">🛵 Taxa de entrega na cidade</h3>
+      <p class="dica" style="margin-top:6px">Um valor só para todas as entregas na cidade. O cliente escreve rua, número e bairro, e a taxa entra no total. Vale <strong>na hora</strong>. Deixe 0 para ficar "a combinar".</p>
+      <div class="linha-form">
+        <span>R$</span><input class="campo" id="taxaUnica" inputmode="decimal" placeholder="0,00" style="max-width:130px;flex:0 0 auto">
+        <button class="btn-principal curto" id="salvarTaxaUnica">💾 Salvar taxa</button>
+      </div>
+    </div>
+
+    <div class="bloco">
+      <h3 class="titulo-serif">Dados da loja</h3>
+      <div class="grade-form">
+        <div><label>WhatsApp principal <span class="dica">(recebe os pedidos)</span></label><input class="campo" id="cfWhats" inputmode="tel" placeholder="(16) 99153-0000"></div>
+        <div><label>WhatsApp 2 <span class="dica">(opcional)</span></label><input class="campo" id="cfWhats2" inputmode="tel" placeholder="(16) 9...."></div>
+        <div><label>Chave Pix</label><input class="campo" id="cfPix"></div>
+        <div><label>Tipo da chave</label>
+          <select class="campo" id="cfPixTipo">
+            <option value="telefone">Telefone</option><option value="cpf">CPF</option><option value="cnpj">CNPJ</option>
+            <option value="email">E-mail</option><option value="aleatoria">Chave aleatória</option>
+          </select></div>
+        <div><label>Nome de quem recebe o Pix</label><input class="campo" id="cfPixNome" placeholder="Como aparece no banco"></div>
+        <div><label>Cidade (para o Pix)</label><input class="campo" id="cfPixCidade" placeholder="Ex.: Ituverava - SP"></div>
+        <div class="largo"><label>Frase da loja <span class="dica">(aparece embaixo do nome, no topo do site)</span></label><input class="campo" id="cfFrase" placeholder="Fome? É na Mota Lanches."></div>
+        <div class="largo"><label>Endereço <span class="dica">(aparece para quem vai retirar)</span></label><input class="campo" id="cfEndereco" placeholder="Ex.: Rua Exemplo, 123 — Centro, Ituverava — SP"></div>
+      </div>
+
+      <p style="margin-top:18px;font-weight:800">🕒 Horário de funcionamento <span class="dica">(mostra "Aberto agora" / "Fechado" no site e só aceita pedidos no horário)</span></p>
+      <div id="cfHorarios"></div>
+      <p class="dica">Marque os dias que a loja abre. Dia desmarcado = fechado. Se fechar depois da meia-noite, é só pôr o horário (ex.: 18:00 às 00:30). Sem nenhum dia marcado, o site não limita horário.</p>
+
+      <label>Texto do horário <span class="dica">(opcional — se ficar vazio, o site monta sozinho com os horários acima)</span></label>
+      <input class="campo" id="cfHorario" placeholder="Ex.: Ter a dom 18h–23h30">
+
+      <p style="margin-top:18px;font-weight:800">Redes sociais <span class="dica">(deixe em branco se não usar)</span></p>
+      <label>📷 Instagram</label>
+      <input class="campo" id="cfInsta" placeholder="@motalanches" style="max-width:420px">
+
+      <div style="display:flex;justify-content:flex-end;margin-top:16px"><button class="btn-principal curto" id="cfSalvar">Salvar dados</button></div>
+    </div>
+  </section>
+</div>
+
+<div class="toast escondido" id="toast"></div>
+
+<script src="assets/js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/comum.js"></script>
+<script src="assets/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Política de privacidade | Mota Lanches</title>
+<meta name="theme-color" content="#0f0f0f">
+<link rel="icon" href="assets/img/icone.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  .texto{max-width:760px;margin:0 auto;padding:10px 18px 40px;line-height:1.7}
+  .texto h1{font-family:"Bebas Neue",sans-serif;color:var(--amarelo);font-size:40px;letter-spacing:.5px;margin:18px 0 4px}
+  .texto h2{color:var(--amarelo);font-size:18px;margin:26px 0 6px}
+  .texto p,.texto li{color:#e2e2e2}
+  .texto ul{padding-left:22px}
+  .texto a{color:var(--amarelo)}
+</style>
+</head>
+<body style="padding-bottom:20px">
+<header class="topo">
+  <div class="topo-inner">
+    <img src="assets/img/icone.png" alt="Mascote da Mota Lanches" style="width:72px;height:72px;border-radius:50%">
+    <div><div class="marca" style="font-size:34px">MOTA LANCHES</div><div class="frase">Política de privacidade</div></div>
+  </div>
+</header>
+<main class="texto">
+  <h1>Política de privacidade</h1>
+  <p class="dica">Última atualização: novembro de 2026</p>
+
+  <p>A <strong>Mota Lanches</strong> respeita a sua privacidade. Esta página explica, de forma simples, quais dados pedimos quando você faz um pedido pelo site, para que usamos e quais são os seus direitos, conforme a Lei Geral de Proteção de Dados (LGPD – Lei nº 13.709/2018).</p>
+
+  <h2>1. Quais dados pedimos</h2>
+  <ul>
+    <li><strong>Nome</strong> e <strong>WhatsApp</strong> — para identificar e falar com você sobre o pedido;</li>
+    <li><strong>Endereço, bairro e ponto de referência</strong> — só quando o pedido é para entrega;</li>
+    <li><strong>Itens do pedido, observações e forma de pagamento</strong> (e o valor do troco, se for em dinheiro).</li>
+  </ul>
+  <p>Não pedimos CPF, senha ou dados de cartão. O pagamento por Pix é feito no app do seu banco; o site só mostra o código Pix com o valor do pedido.</p>
+
+  <h2>2. Para que usamos</h2>
+  <ul>
+    <li>Preparar, entregar ou separar o seu pedido para retirada;</li>
+    <li>Falar com você pelo WhatsApp sobre o andamento do pedido;</li>
+    <li>Controle interno de vendas da loja (por exemplo, relatórios de pedidos).</li>
+  </ul>
+  <p>Não vendemos nem passamos os seus dados para outras empresas para propaganda.</p>
+
+  <h2>3. Onde os dados ficam</h2>
+  <p>Os pedidos ficam guardados num banco de dados protegido, que só a equipe da loja acessa com senha. Para facilitar o próximo pedido, o seu <strong>próprio celular</strong> guarda o seu nome, WhatsApp, endereço, a sacola e a lista "Meus pedidos". Você pode apagar isso limpando os dados do navegador.</p>
+
+  <h2>4. Por quanto tempo</h2>
+  <p>Guardamos os pedidos pelo tempo necessário para o controle da loja e para cumprir obrigações legais. Depois disso, eles podem ser excluídos.</p>
+
+  <h2>5. Seus direitos</h2>
+  <p>Você pode pedir, a qualquer momento, para <strong>saber quais dados</strong> seus temos, <strong>corrigir</strong> ou <strong>apagar</strong> os seus dados, quando a lei permitir. É só falar com a gente pelos contatos abaixo.</p>
+
+  <h2>6. Contato</h2>
+  <p id="contatos">WhatsApp: <a id="polWhats" href="#" target="_blank">(16) 99153-0000</a><br>E-mail: <a href="mailto:motalanches70@gmail.com">motalanches70@gmail.com</a></p>
+
+  <p style="margin-top:30px"><a href="index.html">← Voltar ao cardápio</a></p>
+</main>
+<script src="assets/js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/comum.js"></script>
+<script>
+  (async () => {
+    let w = C.WHATSAPP;
+    try { if (banco) { const r = await banco.from("config").select("whatsapp").eq("id", 1).maybeSingle(); if (r.data && r.data.whatsapp) w = r.data.whatsapp; } } catch (e) {}
+    const a = document.getElementById("polWhats"); a.textContent = telVisivel(w); a.href = linkWhats("Olá, Mota Lanches!", w);
+  })();
+</script>
+</body>
+</html>
