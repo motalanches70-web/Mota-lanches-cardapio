@@ -113,7 +113,8 @@ $("menu").addEventListener("click", e => {
   document.querySelectorAll("#menu button").forEach(x => x.classList.toggle("ativa", x === b));
   document.querySelectorAll(".sec").forEach(s => s.classList.toggle("escondido", s.id !== "sec-" + secaoAtual));
   if (secaoAtual === "pedidos") { carregarPedidos(); document.title = "Painel | Mota Lanches"; }
-  if (secaoAtual === "relatorios") gerarRelatorio();
+  if (secaoAtual === "relatorios") { gerarRelatorio(); carregarPrazo(); }
+  if (secaoAtual === "mesa") abrirMesa();
   if (secaoAtual === "cardapio") carregarCardapio();
   if (secaoAtual === "estoque") carregarEstoque();
   if (secaoAtual === "promocoes") carregarPromocoes();
@@ -270,8 +271,9 @@ function imprimirComanda(p) {
   </style></head><body>
     <div class="c g">MOTA LANCHES</div>
     <div class="c num">#${p.numero}</div>
-    <div class="c">${quando} · <b>${entrega ? "ENTREGA" : "RETIRADA"}</b></div>${L}
-    <div><b>${esc(p.cliente_nome)}</b></div><div>${esc(p.telefone)}</div>
+    <div class="c">${quando} · <b>${entrega ? "ENTREGA" : p.tipo === "mesa" ? "MESA " + esc(p.mesa || "") : "RETIRADA"}</b></div>${L}
+    ${p.tipo === "mesa" ? `<div class="c num">MESA ${esc(p.mesa || "")}</div>` : ""}
+    <div><b>${esc(p.cliente_nome)}</b></div>${p.telefone ? `<div>${esc(p.telefone)}</div>` : ""}
     ${entrega ? `<div>${esc(p.endereco || "")}${p.bairro ? " - " + esc(p.bairro) : ""}</div>${p.referencia ? `<div>Ref.: ${esc(p.referencia)}</div>` : ""}` : ""}${L}
     ${itens}${L}
     ${linha("Subtotal", dinheiro(p.subtotal))}
@@ -329,9 +331,9 @@ function cartaoPedido(p, chegou) {
   if (p.status !== "cancelado") botoes += p.pago
     ? `<button class="b-despagar" data-pago="${p.id}" data-v="0">↩ ${ehPix ? "Voltar para aguardando Pix" : "Desmarcar pago"}</button>`
     : `<button class="b-pago" data-pago="${p.id}" data-v="1">✅ ${ehPix ? "Pix concluído" : "Marcar como pago"}</button>`;
-  botoes += `<a class="b-whats" target="_blank" href="${whats}">💬 Avisar cliente pelo WhatsApp</a>`;
+  if (tel) botoes += `<a class="b-whats" target="_blank" href="${whats}">💬 Avisar cliente pelo WhatsApp</a>`;
   // Pix ainda não pago: botões para mandar a chave/código Pix ao cliente
-  const codPix = ehPix && !p.pago && p.status !== "cancelado" ? pixCopiaCola(Object.assign({ pix_nome: "", pix_cidade: "" }, cfg), Number(p.total), "MOTA" + p.numero) : "";
+  const codPix = tel && ehPix && !p.pago && p.status !== "cancelado" ? pixCopiaCola(Object.assign({ pix_nome: "", pix_cidade: "" }, cfg), Number(p.total), "MOTA" + p.numero) : "";
   if (codPix) {
     const nome = esc(p.cliente_nome.split(" ")[0]);
     const msgPix = `Olá, ${p.cliente_nome.split(" ")[0]}! Segue o Pix do seu pedido #${p.numero} na Mota Lanches.\n\n` +
@@ -343,12 +345,12 @@ function cartaoPedido(p, chegou) {
   botoes += `<button class="b-print" data-imprimir="${p.id}" title="Imprimir comanda">🖨️</button>`;
   botoes += `<button class="b-excluir" data-excluir="${p.id}">Excluir</button>`;
   return `<div class="ped st-${p.status} ${chegou ? "chegou" : ""}" id="p-${p.id}">
-    <div class="ped-topo"><span class="ped-num">#${p.numero}</span><span>${hora(p.criado_em)} · <strong>${p.tipo === "entrega" ? "🛵 ENTREGA" : "🏪 RETIRADA"}</strong></span></div>
+    <div class="ped-topo"><span class="ped-num">#${p.numero}</span><span>${hora(p.criado_em)} · <strong>${p.tipo === "entrega" ? "🛵 ENTREGA" : p.tipo === "mesa" ? "🍽️ MESA " + esc(p.mesa || "") : "🏪 RETIRADA"}</strong></span></div>
     ${p.status === "cancelado" ? `<span class="selo-cancelado">CANCELADO</span>` : p.status === "finalizado" ? `<span class="selo-fim">FINALIZADO</span>` : ""}
     ${p.status === "cancelado" ? "" : String(p.pagamento) === "Pix"
       ? (p.pago ? `<span class="selo-pago">✅ PIX CONCLUÍDO</span>` : `<span class="selo-aguardando">⏳ AGUARDANDO PIX</span>`)
-      : (p.pago ? `<span class="selo-pago">✅ PAGO</span>` : "")}
-    <div style="margin-top:4px"><strong>${esc(p.cliente_nome)}</strong> · ${esc(p.telefone)}</div>
+      : (p.pago ? `<span class="selo-pago">✅ PAGO</span>` : String(p.pagamento) === "A prazo" ? `<span class="selo-aguardando">📒 A PRAZO</span>` : "")}
+    <div style="margin-top:4px"><strong>${esc(p.cliente_nome)}</strong>${p.telefone ? " · " + esc(p.telefone) : ""}</div>
     ${p.tipo === "entrega" ? `<div>📍 ${esc(p.endereco)} — ${esc(p.bairro)}${p.referencia ? ` <span class="dica">(${esc(p.referencia)})</span>` : ""}</div>` : ""}
     <ul>${p.itens.map(i => `<li><strong>${i.qtd}x</strong> ${i.codigo ? `<span class="cod">${esc(i.codigo)}</span> ` : ""}${esc(i.nome)} <span class="dica">${dinheiro(i.preco * i.qtd)}</span>
       ${i.sem && i.sem.length ? `<div class="obs sem">✕ SEM ${esc(i.sem.join(", "))}</div>` : ""}
@@ -450,10 +452,10 @@ async function gerarRelatorio() {
   const cancel = lista.length - validos.length;
   const soma = (arr, f) => arr.reduce((s, p) => s + Number(f(p) || 0), 0);
   const fat = soma(validos, p => p.total);
-  const porPag = {}, porItem = {}, porDia = {}, porTipo = { entrega: 0, retirada: 0 };
+  const porPag = {}, porItem = {}, porDia = {}, porTipo = { entrega: 0, retirada: 0, mesa: 0 };
   validos.forEach(p => {
     porPag[p.pagamento] = (porPag[p.pagamento] || 0) + Number(p.total);
-    porTipo[p.tipo]++;
+    porTipo[p.tipo] = (porTipo[p.tipo] || 0) + 1;
     const d = new Date(p.criado_em).toLocaleDateString("pt-BR");
     porDia[d] = porDia[d] || { n: 0, v: 0 }; porDia[d].n++; porDia[d].v += Number(p.total);
     p.itens.forEach(i => { porItem[i.nome] = porItem[i.nome] || { q: 0, v: 0 }; porItem[i.nome].q += i.qtd; porItem[i.nome].v += i.preco * i.qtd; });
@@ -475,6 +477,7 @@ async function gerarRelatorio() {
         ${Object.entries(porPag).map(([k, v]) => `<div class="linha-lista"><span>${esc(k)}</span><strong>${dinheiro(v)}</strong></div>`).join("") || `<p class="dica">Sem vendas.</p>`}
         <div class="linha-lista"><span>🛵 Entregas</span><strong>${porTipo.entrega}</strong></div>
         <div class="linha-lista"><span>🏪 Retiradas</span><strong>${porTipo.retirada}</strong></div>
+        <div class="linha-lista"><span>🍽️ Mesa (na lanchonete)</span><strong>${porTipo.mesa}</strong></div>
       </div>
       <div class="bloco" style="margin:0;grid-column:span 2"><h3>Mais vendidos</h3>
         ${top.map(([n, x]) => `<div style="margin-top:8px"><div style="display:flex;justify-content:space-between"><span>${esc(n)}</span><span><strong>${x.q}</strong> · ${dinheiro(x.v)}</span></div>
@@ -834,6 +837,7 @@ function desenharIngr() {
       </div>
       <select class="campo" data-campo="unidade" aria-label="Unidade">${UNIDADES.concat(UNIDADES.includes(i.unidade) ? [] : [i.unidade]).map(u => `<option ${u === i.unidade ? "selected" : ""}>${esc(u)}</option>`).join("")}</select>
       <label class="avisar">Avisar quando ficar em <input class="campo" data-campo="avisar_em" value="${numTela(i.avisar_em)}" placeholder="—" inputmode="decimal"></label>
+      <label class="avisar">Gasta por lanche <input class="campo" data-campo="por_lanche" value="${numTela(i.por_lanche)}" placeholder="—" inputmode="decimal"> ${esc(i.unidade)}</label>
       <button class="icone-btn" data-acao="apagar" aria-label="Apagar ${esc(i.nome)}">🗑️</button>
     </div>`;
   }).join("") || `<p class="vazio">Nenhum ingrediente encontrado.</p>`;
@@ -853,9 +857,10 @@ $("listaIngr").addEventListener("change", e => {
   if (campo === "unidade") return salvarIngr(i, { unidade: e.target.value }, `${i.nome}: unidade salva`);
   const t = e.target.value.trim();
   if (campo === "avisar_em" && !t) return salvarIngr(i, { avisar_em: null }, `${i.nome}: sem aviso`);
+  if (campo === "por_lanche" && !t) return salvarIngr(i, { por_lanche: null }, `${i.nome}: não baixa sozinho`);
   const v = num(t || "0");
   if (isNaN(v) || v < 0) { desenharIngr(); return aviso("Número inválido.", true); }
-  salvarIngr(i, { [campo]: v }, campo === "quantidade" ? `${i.nome}: ${numTela(v)} ${i.unidade}` : `${i.nome}: avisa com ${numTela(v)} ${i.unidade}`);
+  salvarIngr(i, { [campo]: v }, campo === "quantidade" ? `${i.nome}: ${numTela(v)} ${i.unidade}` : campo === "por_lanche" ? `${i.nome}: cada lanche gasta ${numTela(v)} ${i.unidade}` : `${i.nome}: avisa com ${numTela(v)} ${i.unidade}`);
 });
 $("listaIngr").addEventListener("click", async e => {
   const b = e.target.closest("button[data-acao]"); if (!b) return;
@@ -1047,3 +1052,147 @@ $("listaCombos").addEventListener("change", async e => {
 });
 
 iniciar();
+
+
+/* =========================================================
+   MESA — pedido feito pela garçonete (consumo na lanchonete)
+   ========================================================= */
+let comanda = [], pagMesa = "Pagar no final", combosMesa = [];
+const precoProd = p => Number(p.preco_oferta ?? p.preco);
+function ingrDoLanche(desc) {
+  return String(desc || "").split(",").map(t => t.trim().replace(/\.$/, ""))
+    .filter(t => t && !/^p[ãa]o$/i.test(t) && !/^porção/i.test(t));
+}
+async function abrirMesa() {
+  if (!produtos.length) await carregarCardapio();
+  const { data } = await banco.from("combos").select("*").eq("ativo", true).order("criado_em");
+  combosMesa = data || [];
+  desenharMesaCardapio(); desenharComanda();
+}
+function desenharMesaCardapio() {
+  const f = slug($("mesaBusca").value).replace(/-/g, " ").trim();
+  const bate = (p) => !f || slug(p.nome + " " + (p.codigo || "")).replace(/-/g, " ").includes(f);
+  let html = "";
+  categorias.forEach(c => {
+    const lista = produtos.filter(p => p.categoria === c.nome && p.ativo && bate(p));
+    if (!lista.length) return;
+    html += `<p class="grupo-titulo">${esc(c.nome)}</p><div class="mesa-lista">` + lista.map(p =>
+      `<button class="mesa-item" data-tipo="produto" data-id="${esc(p.id)}" ${p.em_falta ? "disabled" : ""}>
+        <span>${p.codigo ? `<span class="cod">${esc(p.codigo)}</span> ` : ""}${esc(p.nome)}${p.em_falta ? " (em falta)" : ""}</span><strong>${dinheiro(precoProd(p))}</strong></button>`).join("") + `</div>`;
+  });
+  const cb = combosMesa.filter(bate);
+  if (cb.length) html += `<p class="grupo-titulo">Combos</p><div class="mesa-lista">` + cb.map(c =>
+    `<button class="mesa-item" data-tipo="combo" data-id="${esc(c.id)}"><span>🔥 ${esc(c.nome)}</span><strong>${dinheiro(c.preco)}</strong></button>`).join("") + `</div>`;
+  $("mesaCardapio").innerHTML = html || `<p class="vazio">Nada encontrado.</p>`;
+}
+$("mesaBusca").addEventListener("input", desenharMesaCardapio);
+$("mesaCardapio").addEventListener("click", e => {
+  const b = e.target.closest(".mesa-item"); if (!b) return;
+  if (b.dataset.tipo === "combo") {
+    const c = combosMesa.find(x => x.id === b.dataset.id);
+    comanda.push({ tipo: "combo", id: c.id, nome: "Combo " + c.nome, preco: Number(c.preco), qtd: 1, obs: "", sem: [], add: [], opcoes: false, ingr: [] });
+  } else {
+    const p = produtos.find(x => x.id === b.dataset.id);
+    comanda.push({ tipo: "produto", id: p.id, nome: p.nome, preco: precoProd(p), qtd: 1, obs: "", sem: [], add: [], opcoes: p.tem_opcoes, ingr: p.tem_opcoes ? ingrDoLanche(p.descricao) : [] });
+  }
+  desenharComanda();
+  aviso("✓ " + b.querySelector("span").textContent.trim() + " na comanda");
+});
+function totalLinha(l) { return (l.preco + l.add.reduce((s, a) => s + a.preco * a.qtd, 0)) * l.qtd; }
+function desenharComanda() {
+  const ativos = adicionais.filter(a => a.ativo !== false);
+  $("mesaItens").innerHTML = comanda.length ? comanda.map((l, n) => `
+    <div class="mesa-linha" data-n="${n}">
+      <div class="mesa-linha-topo">
+        <strong>${esc(l.nome)}</strong>
+        <div class="qtd-ctrl"><button data-m="menos" aria-label="Diminuir">−</button><span>${l.qtd}</span><button data-m="mais" aria-label="Aumentar">+</button></div>
+        <span class="mesa-valor">${dinheiro(totalLinha(l))}</span>
+      </div>
+      ${l.ingr.length ? `<div class="mesa-chips"><span class="dica">Tirar:</span>${l.ingr.map(t => `<button class="chip-mesa ${l.sem.includes(t) ? "tirado" : ""}" data-m="sem" data-v="${esc(t)}">${l.sem.includes(t) ? "✕ " : ""}${esc(t)}</button>`).join("")}</div>` : ""}
+      ${l.opcoes && ativos.length ? `<div class="mesa-chips">
+        ${l.add.map((a, k) => `<button class="chip-mesa com" data-m="tiraadd" data-k="${k}">+ ${a.qtd > 1 ? a.qtd + "x " : ""}${esc(a.nome)} ✕</button>`).join("")}
+        <select class="campo mesa-add" data-m="add"><option value="">+ Adicional</option>${ativos.map(a => `<option value="${a.id}">${esc(a.nome)} (+${dinheiro(Number(a.preco))})</option>`).join("")}</select></div>` : ""}
+      <input class="campo mesa-obs" data-m="obs" value="${esc(l.obs)}" placeholder="Observação deste item (ex.: bem passado)" maxlength="140">
+    </div>`).join("") : `<p class="vazio">Nenhum item ainda. Toque nos lanches ao lado.</p>`;
+  $("mesaTotal").textContent = dinheiro(comanda.reduce((s, l) => s + totalLinha(l), 0));
+}
+$("mesaItens").addEventListener("click", e => {
+  const b = e.target.closest("button[data-m]"); if (!b) return;
+  const l = comanda[b.closest("[data-n]").dataset.n];
+  if (b.dataset.m === "mais") l.qtd++;
+  if (b.dataset.m === "menos") { l.qtd--; if (l.qtd <= 0) comanda.splice(comanda.indexOf(l), 1); }
+  if (b.dataset.m === "sem") { const v = b.dataset.v; l.sem = l.sem.includes(v) ? l.sem.filter(x => x !== v) : l.sem.concat(v); }
+  if (b.dataset.m === "tiraadd") { const a = l.add[b.dataset.k]; a.qtd > 1 ? a.qtd-- : l.add.splice(b.dataset.k, 1); }
+  desenharComanda();
+});
+$("mesaItens").addEventListener("change", e => {
+  const el = e.target; const box = el.closest("[data-n]"); if (!box) return;
+  const l = comanda[box.dataset.n];
+  if (el.dataset.m === "add" && el.value) {
+    const a = adicionais.find(x => String(x.id) === el.value);
+    const ja = l.add.find(x => x.id === a.id);
+    if (ja) ja.qtd++; else l.add.push({ id: a.id, nome: a.nome, preco: Number(a.preco), qtd: 1 });
+    desenharComanda();
+  }
+  if (el.dataset.m === "obs") l.obs = el.value.trim();
+});
+$("mesaPag").addEventListener("click", e => {
+  const b = e.target.closest(".opcao"); if (!b) return;
+  pagMesa = b.dataset.valor;
+  $("mesaPag").querySelectorAll(".opcao").forEach(o => o.classList.toggle("marcada", o === b));
+});
+$("mesaEnviar").onclick = async () => {
+  const erro = $("mesaErro"); erro.textContent = "";
+  document.querySelectorAll(".mesa-obs").forEach(el => { comanda[el.closest("[data-n]").dataset.n].obs = el.value.trim(); });
+  const mesa = $("mesaNum").value.trim();
+  if (!mesa) { erro.textContent = "Escreva o número da mesa."; $("mesaNum").focus(); return; }
+  if (!comanda.length) { erro.textContent = "Coloque pelo menos um item na comanda."; return; }
+  if (pagMesa === "A prazo" && !$("mesaNome").value.trim()) { erro.textContent = "Para vender a prazo, escreva o nome do cliente."; $("mesaNome").focus(); return; }
+  const botao = $("mesaEnviar"); botao.disabled = true; botao.textContent = "Enviando...";
+  const pedido = {
+    tipo: "mesa", mesa, cliente_nome: $("mesaNome").value.trim() || null, pagamento: pagMesa,
+    observacao: $("mesaObs").value.trim(),
+    itens: comanda.map(l => ({ tipo: l.tipo, id: l.id, qtd: l.qtd, obs: l.obs, sem: l.sem, add: l.add.map(a => ({ id: a.id, qtd: a.qtd })) }))
+  };
+  const { data, error } = await banco.rpc("criar_pedido", { p: pedido });
+  botao.disabled = false; botao.textContent = "Enviar para a cozinha";
+  if (error || !data || !data.length) {
+    const m = error ? error.message || "" : "";
+    erro.textContent = m.includes("SEM_ESTOQUE") ? "Acabou o estoque de: " + m.split("SEM_ESTOQUE:")[1]
+      : m.includes("ITEM_INDISPONIVEL") ? "Um item da comanda está em falta. Tire ele e tente de novo."
+      : m.includes("SO_PAINEL") ? "Entre no painel de novo (saia e entre) e tente outra vez."
+      : m.includes("DADOS_INVALIDOS") ? "Confira a mesa e o pagamento."
+      : "Não deu para enviar. Confira a internet e tente de novo.";
+    return;
+  }
+  const { pedido_id, pedido_numero } = data[0];
+  aviso(`Pedido #${pedido_numero} da mesa ${mesa} enviado! 🍽️`);
+  if ($("mesaImprimir").checked) {
+    const { data: pd } = await banco.from("pedidos").select("*").eq("id", pedido_id).maybeSingle();
+    if (pd) imprimirComanda(pd);
+  }
+  comanda = []; $("mesaNum").value = ""; $("mesaNome").value = ""; $("mesaObs").value = "";
+  desenharComanda(); carregarEstoque();
+};
+
+
+/* ---------- A prazo (fiado) em aberto ---------- */
+async function carregarPrazo() {
+  const { data, error } = await banco.from("pedidos").select("*")
+    .eq("pagamento", "A prazo").eq("pago", false).neq("status", "cancelado").order("criado_em", { ascending: true });
+  if (error) { $("listaPrazo").innerHTML = ""; return; }
+  const total = data.reduce((s, p) => s + Number(p.total), 0);
+  $("listaPrazo").innerHTML = data.length
+    ? data.map(p => `<div class="linha-lista" data-id="${p.id}">
+        <span><strong>${esc(p.cliente_nome)}</strong> · #${p.numero}${p.mesa ? " · mesa " + esc(p.mesa) : ""} · ${new Date(p.criado_em).toLocaleDateString("pt-BR")}</span>
+        <span style="display:flex;gap:8px;align-items:center"><strong>${dinheiro(p.total)}</strong><button class="btn-sec" data-recebi="${p.id}">✅ Recebi</button></span>
+      </div>`).join("") + `<div class="linha-lista"><span><strong>Total a receber</strong></span><strong>${dinheiro(total)}</strong></div>`
+    : `<p class="vazio">Ninguém devendo. 🎉</p>`;
+}
+$("listaPrazo").addEventListener("click", async e => {
+  const b = e.target.closest("[data-recebi]"); if (!b) return;
+  b.disabled = true;
+  const { error } = await banco.from("pedidos").update({ pago: true, pago_em: new Date().toISOString() }).eq("id", b.dataset.recebi);
+  if (deuErro(error)) { b.disabled = false; return; }
+  aviso("Pagamento recebido ✅"); carregarPrazo();
+});

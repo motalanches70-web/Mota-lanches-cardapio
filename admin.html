@@ -8,9 +8,9 @@
 <meta name="theme-color" content="#0f0f0f">
 <link rel="icon" href="assets/img/icone.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/variables.css?v=20261122a">
-<link rel="stylesheet" href="assets/css/style.css?v=20261122a">
-<link rel="stylesheet" href="assets/css/admin.css?v=20261122a">
+<link rel="stylesheet" href="assets/css/variables.css?v=20261122c">
+<link rel="stylesheet" href="assets/css/style.css?v=20261122c">
+<link rel="stylesheet" href="assets/css/admin.css?v=20261122c">
 </head>
 <body class="claro">
 <header class="topo" style="padding:14px 18px">
@@ -56,6 +56,7 @@
   </div>
   <nav class="menu-adm" id="menu">
     <button data-sec="pedidos" class="ativa">📋 Pedidos<span class="n escondido" id="nNovos"></span></button>
+    <button data-sec="mesa">🍽️ Mesa</button>
     <button data-sec="relatorios">📊 Relatórios</button>
     <button data-sec="cardapio">🍔 Cardápio<span class="n escondido" id="nBaixo"></span></button>
     <button data-sec="estoque">📦 Estoque<span class="n escondido" id="nEstoque"></span></button>
@@ -92,6 +93,11 @@
         <button class="btn-principal curto" id="relGerar">Ver relatório</button>
         <button class="btn-sec" id="relCsv">⬇️ Baixar CSV (Excel)</button>
       </div>
+    </div>
+    <div class="bloco" id="blocoPrazo">
+      <h3>📒 A prazo (fiado) em aberto</h3>
+      <p class="dica">Pedidos da mesa vendidos a prazo que ainda não foram pagos. Quando o cliente pagar, toque em <strong>"Recebi"</strong>.</p>
+      <div id="listaPrazo"></div>
     </div>
     <div id="relResultado"></div>
   </section>
@@ -169,10 +175,46 @@
   </div>
 
   <!-- ESTOQUE DE INGREDIENTES -->
+  <!-- MESA: pedido feito pela garçonete -->
+  <section class="sec escondido" id="sec-mesa">
+    <div class="mesa-grade">
+      <div class="bloco">
+        <h3 class="titulo-serif">🍽️ Pedido na lanchonete</h3>
+        <p class="dica" style="margin-top:6px">Para a garçonete anotar o pedido de quem vai comer aqui. Toque no lanche para colocar na comanda. O pedido vai direto para a aba <strong>Pedidos</strong>.</p>
+        <input class="campo" id="mesaBusca" placeholder="🔎 Procurar lanche (nome ou código)" style="margin-top:10px">
+        <div id="mesaCardapio"></div>
+      </div>
+      <div class="bloco mesa-comanda">
+        <h3>Comanda</h3>
+        <div class="linha-form" style="margin-top:8px">
+          <label style="flex:0 0 110px">Mesa<input class="campo" id="mesaNum" inputmode="numeric" placeholder="Ex.: 5" maxlength="10"></label>
+          <label style="flex:1">Nome do cliente <span class="dica">(opcional)</span><input class="campo" id="mesaNome" maxlength="60"></label>
+        </div>
+        <div id="mesaItens"><p class="vazio">Nenhum item ainda.</p></div>
+        <label for="mesaObs">Observação do pedido</label>
+        <textarea class="campo" id="mesaObs" maxlength="300" placeholder="Ex.: trazer tudo junto"></textarea>
+        <label style="margin-top:10px">Pagamento</label>
+        <div class="mesa-pag" id="mesaPag">
+          <button class="opcao marcada" data-valor="Pagar no final">Pagar no final</button>
+          <button class="opcao" data-valor="Dinheiro">Dinheiro</button>
+          <button class="opcao" data-valor="Pix">Pix</button>
+          <button class="opcao" data-valor="Cartão de crédito">Crédito</button>
+          <button class="opcao" data-valor="Cartão de débito">Débito</button>
+          <button class="opcao" data-valor="A prazo">📒 A prazo</button>
+        </div>
+        <div class="mesa-total"><span>Total</span><strong id="mesaTotal">R$ 0,00</strong></div>
+        <label class="check"><input type="checkbox" id="mesaImprimir" checked> Imprimir a comanda ao enviar</label>
+        <p class="erro" id="mesaErro"></p>
+        <button class="btn-principal" id="mesaEnviar">Enviar para a cozinha</button>
+      </div>
+    </div>
+  </section>
+
   <section class="sec escondido" id="sec-estoque">
     <div class="bloco">
       <h3 class="titulo-serif">📦 Estoque de ingredientes</h3>
       <p class="dica" style="margin-top:6px">Anote quanto tem de cada ingrediente. Em <strong>"Avisar quando ficar em"</strong>, coloque a quantidade em que o painel deve avisar que está acabando. Deixe vazio para não avisar.</p>
+      <p class="dica" style="margin-top:6px">🔄 <strong>O estoque baixa sozinho</strong> a cada lanche vendido (site e mesa), pelos ingredientes escritos no lanche e pelos adicionais. Em <strong>"Gasta por lanche"</strong>, coloque quanto vai em <u>um</u> lanche (ex.: 1 pão, 0,03 kg de bacon). Se o pedido for cancelado, volta para o estoque.</p>
       <div id="alertaIngr"></div>
     </div>
     <div class="bloco">
@@ -312,9 +354,9 @@
 
 <div class="toast escondido" id="toast"></div>
 
-<script src="assets/js/config.js?v=20261122a"></script>
+<script src="assets/js/config.js?v=20261122c"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="assets/js/comum.js?v=20261122a"></script>
-<script src="assets/js/admin.js?v=20261122a"></script>
+<script src="assets/js/comum.js?v=20261122c"></script>
+<script src="assets/js/admin.js?v=20261122c"></script>
 </body>
 </html>

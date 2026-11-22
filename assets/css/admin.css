@@ -150,7 +150,7 @@ body{padding-bottom:30px}
 @media(max-width:600px){.dia{grid-template-columns:1fr 1fr;}.dia .check{grid-column:1/-1}.dia .as{display:none}}
 
 /* Estoque de ingredientes */
-.ingr{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--preto3)}
+.ingr{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto auto auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--preto3)}
 .ingr-nome{font-weight:800;font-size:16px}
 .ingr-status{font-size:13px;color:var(--cinza)}
 .ingr.acabando .ingr-status{color:#ffb35c;font-weight:700}
@@ -236,3 +236,32 @@ body.claro{--amarelo-texto:#8a6500}
 .claro .toast{box-shadow:0 8px 24px rgba(0,0,0,.2)}
 .claro .chave{color:#1a1a1a}
 .claro .janela h2{color:#8a6500}
+
+/* Aba Mesa (garçonete) */
+.mesa-grade{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;align-items:start}
+@media(max-width:860px){.mesa-grade{grid-template-columns:1fr}.mesa-comanda{order:-1}}
+.mesa-comanda{position:sticky;top:70px}
+@media(max-width:860px){.mesa-comanda{position:static}}
+.mesa-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin:6px 0 4px}
+.mesa-item{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;background:var(--preto);border:1px solid var(--preto3);color:#fff;border-radius:12px;padding:11px 12px;font-size:14px;min-height:48px}
+.mesa-item:disabled{opacity:.45}
+.mesa-item strong{white-space:nowrap}
+.mesa-linha{border:1px solid var(--preto3);border-radius:12px;padding:10px 12px;margin-top:10px}
+.mesa-linha-topo{display:flex;align-items:center;gap:10px}
+.mesa-linha-topo strong{flex:1}
+.mesa-valor{font-weight:800;white-space:nowrap}
+.mesa-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.chip-mesa{background:var(--preto);border:1px solid var(--preto3);color:#fff;border-radius:99px;padding:6px 10px;font-size:13px}
+.chip-mesa.tirado{border-color:var(--vermelho);color:#ff8a8d;text-decoration:line-through}
+.chip-mesa.com{border-color:var(--verde);color:#8fe3a9}
+.mesa-add{width:auto;padding:6px 10px;font-size:13px;min-height:0}
+.mesa-obs{margin-top:8px;padding:9px 12px;font-size:14px}
+.mesa-pag{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin:6px 0 12px}
+.mesa-total{display:flex;justify-content:space-between;font-size:20px;font-weight:800;margin:6px 0 10px}
+.mesa-comanda .btn-principal{margin-top:10px}
+.claro .mesa-item,.claro .chip-mesa{background:#fff;border-color:#ddd;color:#1a1a1a}
+.claro .mesa-item:hover{border-color:var(--amarelo)}
+.claro .chip-mesa.tirado{border-color:var(--vermelho);color:#c8323a;background:#fff1f1}
+.claro .chip-mesa.com{border-color:var(--verde);color:#17803f;background:#e9f9ef}
+.claro .mesa-linha{border-color:#e4e4e4}
+.claro .mesa-total strong{color:#8a6500}
