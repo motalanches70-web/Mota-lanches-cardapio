@@ -249,3 +249,7 @@ body.claro{background:#fff;color:#1a1a1a;--txt:#1a1a1a;--txt2:#666;--linha:#e4e4
 .claro .faixa-pix div{background:#e9f9ef;color:var(--verd)}
 .claro footer#rodape{background:var(--preto);color:#e9e9e9;border-top:4px solid var(--amarelo);margin-top:30px}
 .claro footer:not(#rodape) a{color:#8a6500}
+/* topo preto continua com letras claras no site branco */
+.claro .topo{color:#fff}
+.claro .status-loja{background:rgba(255,255,255,.12);color:#fff}
+.claro .faixa-pix div{background:#e9f9ef;color:var(--verd);border-color:var(--verde)}

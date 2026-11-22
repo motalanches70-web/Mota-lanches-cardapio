@@ -102,7 +102,8 @@ async function carregarDados() {
       chave_pix: c.chave_pix || "", pix_tipo: c.pix_tipo || "telefone", pix_nome: c.pix_nome || "", pix_cidade: c.pix_cidade || "",
       frase: c.frase || C.SLOGAN, endereco: c.endereco || "", horario: c.horario || "", horarios: c.horarios || null, instagram: c.instagram || "",
       desconto_pix: Number(c.desconto_pix || 0), aberta: c.aberta !== false,
-      taxa_modo: c.taxa_modo || "unica", taxa_unica: Number(c.taxa_unica || 0)
+      taxa_modo: c.taxa_modo || "unica", taxa_unica: Number(c.taxa_unica || 0),
+      entrega_gratis_ate: c.entrega_gratis_ate || null
     },
     categorias,
     adicionais: (adds.data || []).map(a => ({ id: a.id, nome: a.nome, preco: Number(a.preco) })),
@@ -209,3 +210,17 @@ document.addEventListener("click", async e => {
   b.textContent = ok ? "✅ Código copiado!" : "Selecione o código acima e copie";
   setTimeout(() => b.textContent = "📋 Copiar código Pix", 2500);
 });
+
+/* ---------- Entrega grátis (promoção com hora para acabar) ---------- */
+function entregaGratisAgora(cfg) {
+  const ate = cfg && cfg.entrega_gratis_ate ? Date.parse(cfg.entrega_gratis_ate) : 0;
+  return ate > Date.now();
+}
+// "meia-noite", "23h30"...
+function horaGratis(cfg) {
+  const d = new Date(Date.parse(cfg.entrega_gratis_ate));
+  const t = d.toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" });
+  if (t === "00:00") return "meia-noite";
+  const [h, m] = t.split(":");
+  return h + "h" + (m === "00" ? "" : m);
+}

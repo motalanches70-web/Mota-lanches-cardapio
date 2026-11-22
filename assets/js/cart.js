@@ -52,8 +52,8 @@ async function vigiarLoja(aoMudar) {
   setInterval(async () => {
     if (!D) return;
     if (banco) {
-      const { data } = await banco.from("config").select("aberta,horarios").eq("id", 1).maybeSingle();
-      if (data) { D.cfg.aberta = data.aberta; D.cfg.horarios = data.horarios; }
+      const { data } = await banco.from("config").select("aberta,horarios,entrega_gratis_ate").eq("id", 1).maybeSingle();
+      if (data) { D.cfg.aberta = data.aberta; D.cfg.horarios = data.horarios; D.cfg.entrega_gratis_ate = data.entrega_gratis_ate; }
     }
     const agora = lojaAbertaAgora();
     if (agora !== estavaAberta) { estavaAberta = agora; aoMudar(); }
@@ -91,7 +91,7 @@ if ($("paginaCarrinho")) {
     const sub = subtotalSacola();
     const descCupom = cupomAtual ? Math.round(sub * cupomAtual.pct) / 100 : 0;
     const descPix = pagamento === "Pix" && D.cfg.desconto_pix > 0 ? Math.round((sub - descCupom) * D.cfg.desconto_pix) / 100 : 0;
-    const taxa = tipo === "entrega" ? (D.cfg.taxa_unica || 0) : 0;   // uma taxa só para a cidade toda
+    const taxa = tipo === "entrega" && !entregaGratisAgora(D.cfg) ? (D.cfg.taxa_unica || 0) : 0;   // uma taxa só para a cidade toda
     return { sub, descCupom, descPix, taxa, total: sub - descCupom - descPix + taxa };
   };
 
@@ -146,8 +146,10 @@ if ($("paginaCarrinho")) {
     $("rPixNome").textContent = `Desconto no Pix (${D.cfg.desconto_pix}%)`;
     $("rPix").textContent = "− " + dinheiro(c.descPix);
     $("linhaTaxa").classList.toggle("escondido", tipo !== "entrega");
-    $("rTaxa").textContent = c.taxa > 0 ? dinheiro(c.taxa) : "a combinar";
-    $("avisoTaxa").innerHTML = D.cfg.taxa_unica > 0 ? `🛵 Taxa de entrega: <strong>${dinheiro(D.cfg.taxa_unica)}</strong>` : "🛵 Taxa de entrega: <strong>a combinar</strong>";
+    const gratis = entregaGratisAgora(D.cfg);
+    $("rTaxa").textContent = gratis ? "Grátis 🎉" : c.taxa > 0 ? dinheiro(c.taxa) : "a combinar";
+    $("avisoTaxa").innerHTML = gratis ? `🎉 <strong>Entrega GRÁTIS</strong> até ${horaGratis(D.cfg)}!`
+      : D.cfg.taxa_unica > 0 ? `🛵 Taxa de entrega: <strong>${dinheiro(D.cfg.taxa_unica)}</strong>` : "🛵 Taxa de entrega: <strong>a combinar</strong>";
     $("rTotal").textContent = dinheiro(c.total);
     $("camposEntrega").classList.toggle("escondido", tipo !== "entrega");
     $("campoTroco").classList.toggle("escondido", pagamento !== "Dinheiro");
@@ -212,7 +214,7 @@ if ($("paginaCarrinho")) {
     t += `\nSubtotal: ${dinheiro(c.sub)}\n`;
     if (c.descCupom) t += `Cupom ${p.cupom}: − ${dinheiro(c.descCupom)}\n`;
     if (c.descPix) t += `Desconto Pix: − ${dinheiro(c.descPix)}\n`;
-    if (p.tipo === "entrega") t += `Entrega: ${c.taxa > 0 ? dinheiro(c.taxa) : "a combinar"}\n`;
+    if (p.tipo === "entrega") t += `Entrega: ${entregaGratisAgora(D.cfg) ? "GRÁTIS" : c.taxa > 0 ? dinheiro(c.taxa) : "a combinar"}\n`;
     t += `*Total: ${dinheiro(c.total)}*\n\n`;
     t += `Nome: ${p.cliente_nome}\nWhatsApp: ${p.telefone}\n`;
     t += p.tipo === "entrega" ? `Entregar em: ${p.endereco} — ${p.bairroNome}${p.referencia ? " (" + p.referencia + ")" : ""}\n` : `Vou retirar na loja\n`;
@@ -325,5 +327,6 @@ if ($("paginaCarrinho")) {
     desenharSacola();
     mostrarLoja();
     vigiarLoja(mostrarLoja);
+    setInterval(atualizarResumo, 60000);   // a entrega grátis pode acabar
   })();
 }

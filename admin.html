@@ -8,11 +8,11 @@
 <meta name="theme-color" content="#0f0f0f">
 <link rel="icon" href="assets/img/icone.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/variables.css?v=20261121g">
-<link rel="stylesheet" href="assets/css/style.css?v=20261121g">
-<link rel="stylesheet" href="assets/css/admin.css?v=20261121g">
+<link rel="stylesheet" href="assets/css/variables.css?v=20261121i">
+<link rel="stylesheet" href="assets/css/style.css?v=20261121i">
+<link rel="stylesheet" href="assets/css/admin.css?v=20261121i">
 </head>
-<body>
+<body class="claro">
 <header class="topo" style="padding:14px 18px">
   <div class="topo-inner">
     <img src="assets/img/icone.webp" alt="" style="width:56px;height:56px;border-radius:50%">
@@ -23,7 +23,7 @@
 <!-- Login -->
 <div class="login escondido" id="telaLogin">
   <div class="cartao">
-    <h2 style="color:var(--amarelo)">Entrar no painel</h2>
+    <h2 style="color:var(--amarelo-texto,var(--amarelo))">Entrar no painel</h2>
     <label for="email">E-mail</label>
     <input class="campo" id="email" type="email" autocomplete="username">
     <label for="senha">Senha</label>
@@ -191,6 +191,17 @@
   <!-- PROMOÇÕES -->
   <section class="sec escondido" id="sec-promocoes">
     <div class="bloco">
+      <h3>🛵 Entrega grátis</h3>
+      <p class="dica" id="gratisStatus"></p>
+      <div class="linha-form">
+        <button class="btn-principal curto" id="gratisMeiaNoite">Ligar até meia-noite de hoje</button>
+        <span>ou até</span>
+        <input class="campo" id="gratisHora" type="time" value="23:00" style="max-width:130px;flex:0 0 auto">
+        <button class="btn-sec" id="gratisLigar">Ligar</button>
+        <button class="btn-sec" id="gratisDesligar">Desligar</button>
+      </div>
+    </div>
+    <div class="bloco">
       <h3>💚 Desconto no Pix</h3>
       <p class="dica">Desconto automático quando o cliente escolhe Pix. Use 0 para não dar desconto.</p>
       <div class="linha-form">
@@ -301,9 +312,9 @@
 
 <div class="toast escondido" id="toast"></div>
 
-<script src="assets/js/config.js?v=20261121g"></script>
+<script src="assets/js/config.js?v=20261121i"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="assets/js/comum.js?v=20261121g"></script>
-<script src="assets/js/admin.js?v=20261121g"></script>
+<script src="assets/js/comum.js?v=20261121i"></script>
+<script src="assets/js/admin.js?v=20261121i"></script>
 </body>
 </html>

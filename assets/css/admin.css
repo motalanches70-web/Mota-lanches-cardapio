@@ -15,7 +15,7 @@ body{padding-bottom:30px}
 
 .sec{max-width:1300px;margin:0 auto;padding:14px}
 .bloco{background:var(--preto2);border:1px solid var(--preto3);border-radius:var(--raio);padding:16px;margin-bottom:14px}
-.bloco h3{color:var(--amarelo);margin-bottom:4px}
+.bloco h3{color:var(--amarelo-texto,var(--amarelo));margin-bottom:4px}
 .linha-form{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .linha-form .campo{flex:1;min-width:120px}
 .btn-principal.curto{width:auto;margin-top:0;padding:12px 18px}
@@ -31,7 +31,7 @@ body{padding-bottom:30px}
 .coluna{background:#151515;border-radius:var(--raio);padding:10px;min-height:120px}
 .col-titulo{font-size:17px;padding:6px 8px;display:flex;align-items:center;gap:8px}
 .col-titulo span:last-child{background:var(--preto3);border-radius:99px;padding:0 9px;font-size:14px}
-.col-titulo.novo{color:var(--amarelo)}
+.col-titulo.novo{color:var(--amarelo-texto,var(--amarelo))}
 .col-titulo.andamento{color:#7cc4ff}
 .col-titulo.fim{color:#8fe3a9}
 .ped{background:var(--preto2);border:1px solid var(--preto3);border-left:5px solid var(--amarelo);border-radius:var(--raio);padding:14px;margin-top:10px}
@@ -42,10 +42,10 @@ body{padding-bottom:30px}
 .ped.chegou{animation:pisca 1.2s ease-in-out 4}
 @keyframes pisca{50%{box-shadow:0 0 0 3px rgba(255,200,0,.5)}}
 .ped-topo{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
-.ped-num{font-family:"Bebas Neue",sans-serif;font-size:32px;color:var(--amarelo);line-height:1}
+.ped-num{font-family:"Bebas Neue",sans-serif;font-size:32px;color:var(--amarelo-texto,var(--amarelo));line-height:1}
 .ped ul{list-style:none;margin:8px 0;padding:8px 0;border-top:1px dashed var(--preto3);border-bottom:1px dashed var(--preto3)}
 .ped li{padding:3px 0}
-.cod{background:var(--preto3);color:var(--amarelo);font-weight:800;font-size:12px;padding:1px 7px;border-radius:6px}
+.cod{background:var(--preto3);color:var(--amarelo-texto,var(--amarelo));font-weight:800;font-size:12px;padding:1px 7px;border-radius:6px}
 .ped .obs{font-size:13px;margin-left:22px;color:var(--amarelo2)}
 .ped .sem{color:#ff8a8d;font-weight:700}
 .ped .add{color:#8fe3a9;font-weight:700}
@@ -66,7 +66,7 @@ body{padding-bottom:30px}
 .tabela td{padding:6px;border-bottom:1px solid var(--preto3);vertical-align:middle}
 .tabela input.campo{padding:8px;min-width:70px}
 .tabela .num{text-align:right;white-space:nowrap}
-.cat-titulo{color:var(--amarelo);margin:18px 0 0;font-size:16px}
+.cat-titulo{color:var(--amarelo-texto,var(--amarelo));margin:18px 0 0;font-size:16px}
 .mini{padding:8px 12px;border-radius:9px;font-weight:700;font-size:13px}
 .mini.sal{background:var(--amarelo);color:var(--preto)}
 .mini.del{background:var(--preto3);color:#ff8a8d}
@@ -85,7 +85,7 @@ body{padding-bottom:30px}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:14px}
 .card{background:var(--preto2);border:1px solid var(--preto3);border-radius:var(--raio);padding:14px}
 .card .rotulo{color:var(--cinza);font-size:13px}
-.card .valor{font-size:24px;font-weight:800;color:var(--amarelo)}
+.card .valor{font-size:24px;font-weight:800;color:var(--amarelo-texto,var(--amarelo))}
 .barra-h{height:10px;background:var(--amarelo);border-radius:99px}
 
 /* Lista simples (cupons, bairros, combos) */
@@ -125,7 +125,7 @@ body{padding-bottom:30px}
 .flag{display:flex;align-items:center;gap:8px;background:var(--preto);border:1px solid var(--preto3);border-radius:10px;padding:8px 12px;font-weight:700;font-size:14px;cursor:pointer;margin:0;white-space:nowrap}
 .flag input{width:20px;height:20px;accent-color:var(--amarelo)}
 .flag.on-falta{border-color:var(--vermelho);color:#ff8a8d}
-.flag.on-top{border-color:var(--amarelo);color:var(--amarelo)}
+.flag.on-top{border-color:var(--amarelo);color:var(--amarelo-texto,var(--amarelo))}
 .btn-editar{background:var(--preto);border:1px solid var(--preto3);color:#fff;font-weight:800;border-radius:10px;padding:0 18px;align-self:stretch;min-height:46px}
 .selo-mini{font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
 .selo-mini.vermelho{background:var(--vermelho);color:#fff}
@@ -190,3 +190,53 @@ body{padding-bottom:30px}
 /* Botões do Pix no pedido */
 .acoes .b-enviar-pix{background:#32bcad;color:#04201d}
 .acoes .b-copiar-pix{background:var(--preto3);color:#fff;border:1px dashed #32bcad}
+
+/* ================================================================
+   PAINEL COM FUNDO BRANCO (<body class="claro">)
+   ================================================================ */
+body.claro{--amarelo-texto:#8a6500}
+.claro .janela{background:#fff;color:#1a1a1a}
+.claro .fundo{background:rgba(0,0,0,.45)}
+.claro .fechar{background:#f0f0f0;color:#1a1a1a}
+.claro .menu-adm{background:#fff;border-bottom:1px solid #e4e4e4;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.claro .menu-adm button{background:#f4f4f4;color:#1a1a1a}
+.claro .menu-adm button.ativa{background:var(--amarelo);color:var(--preto)}
+.claro .bloco,.claro .card,.claro .ped{background:#fff;border-color:#e4e4e4;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.claro .ped{border-left-color:var(--amarelo)}
+.claro .ped.st-andamento{border-left-color:#2b8fd6}
+.claro .ped.st-finalizado{border-left-color:var(--verde)}
+.claro .ped.st-cancelado{background:#fff1f1;border-color:#f3b8ba;border-left-color:var(--vermelho)}
+.claro .ped.st-cancelado .ped-num{color:#c8323a}
+.claro .coluna{background:#f3f3f3}
+.claro .col-titulo span:last-child{background:#e4e4e4}
+.claro .col-titulo.andamento{color:#1f6fb0}
+.claro .col-titulo.fim{color:#17803f}
+.claro .ped ul{border-color:#ddd}
+.claro .cod{background:#fff3c4;color:#6b4e00}
+.claro .ped .obs{color:#8a6500}
+.claro .ped .sem,.claro .b-cancelar,.claro .mini.del,.claro .alerta strong,.claro .flag.on-falta,.claro .ingr.acabou .ingr-status,.claro .som-off{color:#c8323a!important}
+.claro .ped .add{color:#17803f}
+.claro .b-excluir,.claro .b-despagar{background:#f0f0f0;color:#555}
+.claro .b-print,.claro .acoes .b-copiar-pix{background:#f0f0f0;color:#1a1a1a}
+.claro .tabela th,.claro .tabela td,.claro .linha-lista,.claro .prod,.claro .ingr,.claro .linha-info{border-color:#e4e4e4}
+.claro .tabela th,.claro .card .rotulo,.claro .linha-info,.claro .prod-desc,.claro .grupo-titulo,.claro .ingr-status,.claro .avisar,.claro .prod-ctrl .rot{color:#666}
+.claro .mini.del{background:#f4f4f4}
+.claro .cb-item{background:#f4f4f4}
+.claro .titulo-serif{color:#1a1a1a!important}
+.claro .linha-info strong{color:#1a1a1a}
+.claro .info{background:#fffbea}
+.claro .icone-btn,.claro .btn-editar,.claro .flag{background:#fff;border-color:#ddd;color:#1a1a1a}
+.claro .flag.on-top{border-color:var(--amarelo);color:#8a6500;background:#fffbea}
+.claro .flag.on-falta{border-color:var(--vermelho);background:#fff1f1}
+.claro .prod-foto,.claro .foto-prev{background:#f0f0f0}
+.claro .selo-mini.cinza{background:#f0f0f0;color:#666}
+.claro .qtd-ctrl button{background:#f0f0f0;color:#1a1a1a}
+.claro .dia input[type=time]{color-scheme:light}
+.claro .ingr.acabando .ingr-status{color:#a35b00}
+.claro .ingr.acabando{background:#fff7ea}
+.claro .ingr.acabou{background:#fff1f1}
+.claro .baixo td{background:#fff1f1}
+.claro .alerta{background:#fff1f1}
+.claro .toast{box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.claro .chave{color:#1a1a1a}
+.claro .janela h2{color:#8a6500}

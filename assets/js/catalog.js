@@ -33,6 +33,9 @@ if ($("cardapio")) {
 
   function mostrarLoja() {
     const aberta = lojaAbertaAgora();
+    const gratis = aberta && entregaGratisAgora(D.cfg);
+    $("faixaGratis").classList.toggle("escondido", !gratis);
+    if (gratis) $("faixaGratis").firstElementChild.textContent = `🛵 Entrega GRÁTIS hoje até ${horaGratis(D.cfg)}! 🎉`;
     $("statusLoja").textContent = aberta ? "Aberto agora" : "Fechado agora";
     $("statusLoja").classList.toggle("fechada", !aberta);
     $("avisoFechada").classList.toggle("escondido", aberta);
@@ -143,6 +146,7 @@ if ($("cardapio")) {
     const aviso = sessionStorage.getItem("mota_aviso");
     if (aviso) { sessionStorage.removeItem("mota_aviso"); avisoRapido(aviso); }
     vigiarLoja(() => { mostrarLoja(); desenharCardapio($("busca").value); });
+    setInterval(mostrarLoja, 60000);   // a entrega grátis pode acabar
   })();
 }
 

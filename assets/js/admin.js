@@ -300,7 +300,7 @@ function cartaoPedido(p, chegou) {
     ${String(p.pagamento).startsWith("Cartão") && p.tipo === "entrega" ? `<div class="maquininha">🛵 LEVAR MAQUININHA</div>` : ""}
     ${Number(p.desconto) > 0 ? `<div class="dica">Desconto: − ${dinheiro(p.desconto)}${p.cupom ? ` (cupom ${esc(p.cupom)})` : ""}</div>` : ""}
     ${p.tipo === "entrega" ? `<div class="dica">Entrega: ${Number(p.taxa) > 0 ? dinheiro(p.taxa) : "a combinar"}</div>` : ""}
-    <div style="font-size:18px;font-weight:800;color:var(--amarelo);margin-top:4px">Total ${dinheiro(p.total)}</div>
+    <div style="font-size:18px;font-weight:800;color:var(--amarelo-texto,var(--amarelo));margin-top:4px">Total ${dinheiro(p.total)}</div>
     <div class="acoes">${botoes}</div>
   </div>`;
 }
@@ -755,7 +755,7 @@ function avisoEstoque() {
   $("nEstoque").textContent = n; $("nEstoque").classList.toggle("escondido", !n);
   $("alertaIngr").innerHTML =
     (acabou.length ? `<div class="alerta" style="margin-top:12px"><strong>🚫 Acabou:</strong> ${acabou.map(i => esc(i.nome)).join(" · ")}</div>` : "") +
-    (acabando.length ? `<div class="alerta" style="margin-top:8px;border-color:#ffb35c;background:rgba(255,179,92,.10)"><strong style="color:#ffb35c">⚠️ Acabando:</strong> ` +
+    (acabando.length ? `<div class="alerta" style="margin-top:8px;border-color:#ffb35c;background:rgba(255,179,92,.10)"><strong style="color:#a35b00">⚠️ Acabando:</strong> ` +
       acabando.map(i => `${esc(i.nome)} (restam ${numTela(i.quantidade)} ${esc(i.unidade)})`).join(" · ") + `</div>` : "");
 }
 
@@ -824,8 +824,29 @@ $("niSalvar").onclick = async () => {
 async function carregarPromocoes() {
   if (!produtos.length) await carregarCardapio();
   $("descPix").value = String(cfg.desconto_pix ?? 0).replace(".", ",");
-  carregarCupons(); desenharOfertas();
+  mostrarGratis(); carregarCupons(); desenharOfertas();
 }
+/* Entrega grátis até um horário */
+function mostrarGratis() {
+  const on = entregaGratisAgora(cfg);
+  $("gratisStatus").innerHTML = on ? `<strong style="color:#17803f">✅ Ligada</strong> — entrega grátis até <strong>${horaGratis(cfg)}</strong>. Depois volta a taxa normal sozinha.`
+    : "Desligada. Os clientes pagam a taxa de entrega normal.";
+}
+// próxima vez que o relógio de Brasília marcar "hh:mm" (hoje ou amanhã)
+function proximoHorario(hhmm) {
+  const [h, m] = hhmm.split(":").map(Number);
+  const agora = new Date();
+  const br = new Date(agora.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+  const alvo = new Date(br); alvo.setHours(h, m, 0, 0);
+  if (alvo <= br) alvo.setDate(alvo.getDate() + 1);
+  return new Date(agora.getTime() + (alvo - br)).toISOString();
+}
+async function ligarGratis(hhmm) {
+  if (await salvarConfig({ entrega_gratis_ate: proximoHorario(hhmm) }, "Entrega grátis ligada! 🎉")) mostrarGratis();
+}
+$("gratisMeiaNoite").onclick = () => ligarGratis("00:00");
+$("gratisLigar").onclick = () => { if (!$("gratisHora").value) return aviso("Escolha o horário.", true); ligarGratis($("gratisHora").value); };
+$("gratisDesligar").onclick = async () => { if (await salvarConfig({ entrega_gratis_ate: null }, "Entrega grátis desligada")) mostrarGratis(); };
 $("salvarPix").onclick = () => {
   const v = num($("descPix").value || "0");
   if (isNaN(v) || v < 0 || v > 50) return aviso("Use um número de 0 a 50.", true);
@@ -867,7 +888,7 @@ $("listaCupons").addEventListener("click", async e => {
 function desenharOfertas() {
   const of = produtos.filter(p => p.preco_oferta !== null);
   $("listaOfertas").innerHTML = of.map(p => `<div class="linha-lista" data-id="${esc(p.id)}">
-      <span><strong>${esc(p.nome)}</strong> · <span class="preco-antigo">${dinheiro(p.preco)}</span> <strong style="color:var(--amarelo)">${dinheiro(p.preco_oferta)}</strong></span>
+      <span><strong>${esc(p.nome)}</strong> · <span class="preco-antigo">${dinheiro(p.preco)}</span> <strong style="color:var(--amarelo-texto,var(--amarelo))">${dinheiro(p.preco_oferta)}</strong></span>
       <button class="mini del" data-acao="tirar">Tirar oferta</button></div>`).join("") || `<p class="dica" style="margin-top:10px">Nenhum item em oferta.</p>`;
 }
 $("ofSalvar").onclick = async () => {
@@ -896,7 +917,7 @@ async function carregarCombos() {
   const nomeDe = id => (produtos.find(p => p.id === id) || { nome: "(item apagado)" }).nome;
   $("listaCombos").innerHTML = combos.map(c => `<div class="bloco ${c.ativo ? "" : "desligado"}" data-id="${esc(c.id)}">
       <div class="linha-lista" style="border:0;padding:0">
-        <span><strong style="font-size:18px;color:var(--amarelo)">Combo ${esc(c.nome)}</strong> · <strong>${dinheiro(c.preco)}</strong></span>
+        <span><strong style="font-size:18px;color:var(--amarelo-texto,var(--amarelo))">Combo ${esc(c.nome)}</strong> · <strong>${dinheiro(c.preco)}</strong></span>
         <span class="acoes-mini">
           <label class="chave"><input type="checkbox" data-acao="ativo" ${c.ativo ? "checked" : ""}><span>${c.ativo ? "No site" : "Fora do site"}</span></label>
           <button class="mini sal" data-acao="editar">Editar</button>
