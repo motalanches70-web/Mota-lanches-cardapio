@@ -245,6 +245,65 @@ async function carregarPedidos() {
   desenharPedidos(new Set(chegaram));
 }
 
+/* ---------- Comanda para impressora térmica de 58 mm ----------
+   Imprime só a comanda (num quadro escondido), do tamanho do papel,
+   para a impressora não puxar papel em branco. */
+function imprimirComanda(p) {
+  const L = "<div class='lin'></div>";
+  const quando = new Date(p.criado_em || Date.now()).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+  const itens = (p.itens || []).map(i => `
+    <div class="it"><b>${i.qtd}x ${i.codigo ? "[" + esc(i.codigo) + "] " : ""}${esc(i.nome)}</b><span>${dinheiro(i.preco * i.qtd)}</span></div>
+    ${(i.sem || []).length ? `<div class="sub">SEM: ${esc(i.sem.join(", "))}</div>` : ""}
+    ${(i.add || []).length ? `<div class="sub">+ ${esc(i.add.map(a => (a.qtd > 1 ? a.qtd + "x " : "") + a.nome).join(", "))}</div>` : ""}
+    ${i.obs ? `<div class="sub">OBS: ${esc(i.obs)}</div>` : ""}`).join("");
+  const linha = (a, b) => `<div class="it"><span>${a}</span><span>${b}</span></div>`;
+  const entrega = p.tipo === "entrega";
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Pedido ${p.numero}</title><style>
+    @page{size:58mm auto;margin:0}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{width:58mm;background:#fff;color:#000}
+    body{padding:2mm 5mm 4mm;font:12px/1.3 Arial,Helvetica,sans-serif}
+    .c{text-align:center}.g{font-size:16px;font-weight:900}.num{font-size:22px;font-weight:900}
+    .lin{border-top:1px dashed #000;margin:4px 0}
+    .it{display:flex;justify-content:space-between;gap:4px}.it span:last-child{white-space:nowrap}
+    .sub{padding-left:8px;font-size:11px}.tot{font-size:15px;font-weight:900}
+  </style></head><body>
+    <div class="c g">MOTA LANCHES</div>
+    <div class="c num">#${p.numero}</div>
+    <div class="c">${quando} · <b>${entrega ? "ENTREGA" : "RETIRADA"}</b></div>${L}
+    <div><b>${esc(p.cliente_nome)}</b></div><div>${esc(p.telefone)}</div>
+    ${entrega ? `<div>${esc(p.endereco || "")}${p.bairro ? " - " + esc(p.bairro) : ""}</div>${p.referencia ? `<div>Ref.: ${esc(p.referencia)}</div>` : ""}` : ""}${L}
+    ${itens}${L}
+    ${linha("Subtotal", dinheiro(p.subtotal))}
+    ${Number(p.desconto) > 0 ? linha("Desconto" + (p.cupom ? " (" + esc(p.cupom) + ")" : ""), "- " + dinheiro(p.desconto)) : ""}
+    ${entrega ? linha("Entrega", Number(p.taxa) > 0 ? dinheiro(p.taxa) : Number(cfg.taxa_unica) > 0 ? "Grátis" : "a combinar") : ""}
+    <div class="it tot"><span>TOTAL</span><span>${dinheiro(p.total)}</span></div>${L}
+    <div>Pagamento: <b>${esc(p.pagamento)}</b>${String(p.pagamento).startsWith("Cartão") && entrega ? " (levar maquininha)" : ""}</div>
+    ${p.troco_para ? `<div>Troco para: <b>${dinheiro(p.troco_para)}</b></div>` : ""}
+    ${String(p.pagamento) === "Pix" ? `<div><b>${p.pago ? "PIX PAGO" : "AGUARDANDO PIX"}</b></div>` : ""}
+    ${p.observacao ? `${L}<div>OBS: ${esc(p.observacao)}</div>` : ""}
+    ${L}<div class="c">Fome? É na Mota Lanches.</div>
+  </body></html>`;
+  let q = $("quadroImpressao");
+  if (q) q.remove();
+  q = document.createElement("iframe");
+  q.id = "quadroImpressao";
+  q.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";
+  document.body.appendChild(q);
+  q.contentDocument.open(); q.contentDocument.write(html); q.contentDocument.close();
+  setTimeout(() => {
+    try {
+      // altura do papel = altura da comanda (assim a impressora não puxa papel a mais)
+      const d = q.contentDocument;
+      const mm = Math.ceil(d.body.scrollHeight * 25.4 / 96) + 4;
+      const st = d.createElement("style");
+      st.textContent = `@page{size:58mm ${mm}mm;margin:0}`;
+      d.head.appendChild(st);
+      q.contentWindow.focus(); q.contentWindow.print();
+    } catch (x) { aviso("Não consegui abrir a impressão.", true); }
+  }, 250);
+}
+
 function mensagemCliente(p) {
   const nome = p.cliente_nome.split(" ")[0];
   const pix = String(p.pagamento) === "Pix" && p.status !== "cancelado" ? (p.pago ? " ✅ Pix concluído." : " ⏳ Aguardando o Pix.") : "";
@@ -319,8 +378,8 @@ function desenharPedidos(chegaram = new Set()) {
 $("sec-pedidos").addEventListener("click", async e => {
   const imp = e.target.closest("[data-imprimir]");
   if (imp) {
-    const el = $("p-" + imp.dataset.imprimir);
-    el.classList.add("imprimindo"); try { window.print(); } catch (x) {} el.classList.remove("imprimindo");
+    const pd = pedidos.find(x => x.id === imp.dataset.imprimir);
+    if (pd) imprimirComanda(pd);
     return;
   }
   const pg = e.target.closest("[data-pago]");
