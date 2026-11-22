@@ -273,7 +273,7 @@ if ($("paginaCarrinho")) {
     if (!banco) {
       botao.disabled = false; botao.textContent = "Fazer pedido";
       $("areaFinalizar").classList.add("escondido");
-      $("itensSacola").innerHTML = `<div class="vazio" style="color:#fff">
+      $("itensSacola").innerHTML = `<div class="vazio">
           <p style="font-size:40px">✅</p>
           <p><strong>Falta só um toque!</strong><br>Envie o pedido para a Mota Lanches pelo WhatsApp:</p>
           <a class="btn-whats" id="enviarWhats" target="_blank" href="${linkWhats(mensagem, D.cfg.whatsapp)}">Enviar pedido no WhatsApp</a>

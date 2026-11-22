@@ -40,7 +40,7 @@ async function mostrarPedido() {
     <div class="cartao">
       <div class="dica">Seu pedido</div>
       <div class="num-pedido">#${esc(p.numero)}</div>
-      <div class="dica">${new Date(p.criado_em).toLocaleString("pt-BR")} · ${p.tipo === "entrega" ? "Entrega" : "Retirada na loja"} · <strong style="color:#fff">${dinheiro(p.total)}</strong></div>
+      <div class="dica">${new Date(p.criado_em).toLocaleString("pt-BR")} · ${p.tipo === "entrega" ? "Entrega" : "Retirada na loja"} · <strong>${dinheiro(p.total)}</strong></div>
       ${p.status === "cancelado"
         ? `<p class="cancelado">❌ Este pedido foi cancelado. Se tiver dúvida, fale com a loja.</p>`
         : `<ul class="etapas">${etapas.map((e, n) => `
