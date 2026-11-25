@@ -33,8 +33,6 @@ async function mostrarPedido() {
   const cfgLoja = cfgRes.data || {};
   const whats = cfgLoja.whatsapp || C.WHATSAPP;
   const msgPedido = ler("mota_msg_" + id, "");
-  const mostraPix = p.pagamento === "Pix" && !p.pago && (p.status === "novo" || p.status === "andamento") && cfgLoja.chave_pix;
-  const pix = mostraPix ? caixaPix(Object.assign({ pix_cidade: "", pix_nome: "" }, cfgLoja), Number(p.total), "MOTA" + p.numero) : "";
 
   const html = `
     <div class="cartao">
@@ -48,15 +46,24 @@ async function mostrarPedido() {
               <span class="bola">${n < pos ? "✓" : n + 1}</span>${nomes[e]}
             </li>`).join("")}</ul>`}
       ${p.status === "cancelado" ? "" : p.pagamento === "Pix"
-        ? (p.pago ? `<p class="pago-ok">✅ Pix concluído</p>` : `<p class="pago-espera">⏳ Aguardando Pix</p>`)
+        ? (p.pago ? `<p class="pago-ok">✅ Pix concluído</p>` : `<p class="pago-espera">⏳ Aguardando Pix</p>` +
+            (cfgLoja.chave_pix ? `<div class="pix pix-chave" style="margin-top:10px"><span>Chave Pix: <strong>${esc(cfgLoja.chave_pix)}</strong></span>
+              <button class="btn-sec" type="button" data-copiar-chave="${esc(["telefone", "cpf", "cnpj"].includes(cfgLoja.pix_tipo) ? String(cfgLoja.chave_pix).replace(/\D/g, "") : String(cfgLoja.chave_pix).trim())}">📋 Copiar</button></div>` : ""))
         : (p.pago ? `<p class="pago-ok">✅ Pagamento confirmado pela loja</p>` : "")}
       <p class="dica" style="margin-top:8px">Esta página se atualiza sozinha.</p>
     </div>
     ${msgPedido && p.status !== "cancelado" ? `<a class="btn-whats" target="_blank" href="${linkWhats(msgPedido, whats)}">📲 Enviar pedido também no WhatsApp da loja</a>` : ""}
-    ${pix}
     <a class="btn-whats" target="_blank" href="${linkWhats(msg, whats)}">💬 Falar com a loja no WhatsApp</a>`;
   if (html !== ultimoHtml) { caixa.innerHTML = html; ultimoHtml = html; }
 }
+
+// copiar a chave Pix
+document.addEventListener("click", async e => {
+  const b = e.target.closest("[data-copiar-chave]"); if (!b) return;
+  const ok = await copiarTexto(b.dataset.copiarChave);
+  b.textContent = ok ? "✅ Copiada!" : "Copie a chave ao lado";
+  setTimeout(() => b.textContent = "📋 Copiar", 2500);
+});
 
 if (id) { mostrarPedido(); setInterval(mostrarPedido, 15000); }
 else listaMeusPedidos();
