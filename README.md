@@ -1,7 +1,7 @@
 # Mota Lanches — site de pedidos
 
 **Fome? É na Mota Lanches.**
-Site: https://motalanches70-web.github.io/Mota-lanches-cardapio/
+Site: https://motalanches.pages.dev/ (Cloudflare Pages, publica sozinho a cada envio no GitHub). Endereço antigo: https://motalanches70-web.github.io/Mota-lanches-cardapio/
 
 ## Páginas
 | Arquivo | O que é |
