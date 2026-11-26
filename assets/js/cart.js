@@ -229,7 +229,8 @@ if ($("paginaCarrinho")) {
     CUPOM_INVALIDO: "O cupom não vale mais. Apague o cupom e tente de novo.",
     ITEM_INDISPONIVEL: "Um item da sua sacola não está mais disponível. Recarregue a página.",
     BAIRRO_INVALIDO: "Confira o bairro, por favor.",
-    DADOS_INVALIDOS: "Confira seus dados (nome, WhatsApp e endereço)."
+    DADOS_INVALIDOS: "Confira seus dados (nome, WhatsApp e endereço).",
+    MUITOS_PEDIDOS: "Recebemos vários pedidos seguidos deste número. Aguarde alguns minutos ou fale com a loja pelo WhatsApp."
   };
 
   $("fazerPedido").onclick = async () => {

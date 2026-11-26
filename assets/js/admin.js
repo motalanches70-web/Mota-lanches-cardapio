@@ -103,6 +103,7 @@ async function entrarPainel() {
   carregarCardapio();
   carregarEstoque();
   clearInterval(timer); timer = setInterval(carregarPedidos, 10000);
+  mostrarMensalidade();
   mostrarBotaoSom(); setTimeout(conferirSomLiberado, 500);
 }
 
@@ -1196,3 +1197,38 @@ $("listaPrazo").addEventListener("click", async e => {
   if (deuErro(error)) { b.disabled = false; return; }
   aviso("Pagamento recebido ✅"); carregarPrazo();
 });
+
+
+
+/* ---------- Lembrete da mensalidade do site (config.js → MENSALIDADE) ---------- */
+function mostrarMensalidade() {
+  const M = (window.MOTA || {}).MENSALIDADE, el = $("faixaMensalidade");
+  if (!el || !M || !M.ATIVO) return;
+  // data de hoje no horário de Brasília
+  const br = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+  const hoje = new Date(br.getFullYear(), br.getMonth(), br.getDate());
+  const venc = (ano, mes) => new Date(ano, mes, Math.min(Number(M.DIA_VENCIMENTO) || 10, new Date(ano, mes + 1, 0).getDate()));
+  // vencimento mais próximo: o deste mês, o do mês que vem ou o do mês passado
+  const opcoes = [-1, 0, 1].map(k => venc(hoje.getFullYear(), hoje.getMonth() + k));
+  const dia = 86400000, antes = Number(M.AVISAR_DIAS_ANTES ?? 5), depois = Number(M.AVISAR_DIAS_DEPOIS ?? 5);
+  const v = opcoes.find(d => (d - hoje) / dia <= antes && (hoje - d) / dia <= depois);
+  if (!v) return;
+  const chave = "mota_mensalidade_paga_" + v.getFullYear() + "-" + (v.getMonth() + 1);
+  if (ler(chave, false)) return;
+  const falta = Math.round((v - hoje) / dia);
+  const quando = falta > 1 ? `vence em ${falta} dias (dia ${v.getDate()})` : falta === 1 ? `vence amanhã (dia ${v.getDate()})`
+    : falta === 0 ? "vence hoje" : `venceu dia ${v.getDate()}`;
+  const pixTxt = M.CHAVE_PIX ? ` Pix: <strong>${esc(M.CHAVE_PIX)}</strong>${M.NOME ? " (" + esc(M.NOME) + ")" : ""}.` : "";
+  el.className = "faixa-mensalidade" + (falta < 0 ? " atrasada" : "");
+  el.innerHTML = `<span>💳 A mensalidade do site (<strong>${dinheiro(Number(M.VALOR) || 0)}</strong>) ${quando}.${pixTxt}</span>
+    <span class="faixa-mensalidade-botoes">
+      ${M.CHAVE_PIX ? `<button class="btn-sec" id="mensCopiar">📋 Copiar chave</button>` : ""}
+      ${M.WHATSAPP ? `<a class="btn-sec" target="_blank" href="${linkWhats("Olá! Segue o comprovante da mensalidade do site da " + C.NOME + ".", M.WHATSAPP)}">💬 Enviar comprovante</a>` : ""}
+      <button class="btn-sec" id="mensPaguei">Já paguei</button>
+    </span>`;
+  if ($("mensCopiar")) $("mensCopiar").onclick = async () => {
+    const ok = await copiarTexto(String(M.CHAVE_PIX).trim());
+    $("mensCopiar").textContent = ok ? "✅ Copiada!" : "Copie a chave ao lado";
+  };
+  $("mensPaguei").onclick = () => { guardar(chave, true); el.classList.add("escondido"); };
+}

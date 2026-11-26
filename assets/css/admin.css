@@ -265,3 +265,10 @@ body.claro{--amarelo-texto:#8a6500}
 .claro .chip-mesa.com{border-color:var(--verde);color:#17803f;background:#e9f9ef}
 .claro .mesa-linha{border-color:#e4e4e4}
 .claro .mesa-total strong{color:#8a6500}
+
+
+/* Lembrete da mensalidade do site */
+.faixa-mensalidade{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 14px 0;padding:12px 16px;border-radius:14px;background:#fff6d1;border:1px solid #f1d36b;color:#5c4400;font-size:14px}
+.faixa-mensalidade.atrasada{background:#fff1f1;border-color:#f3b8ba;color:#8f1d24}
+.faixa-mensalidade-botoes{display:flex;gap:8px;flex-wrap:wrap}
+.faixa-mensalidade-botoes .btn-sec{padding:8px 12px;font-size:13px;text-decoration:none}

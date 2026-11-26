@@ -25,5 +25,18 @@ window.MOTA = {
   SUPABASE_CHAVE_PUBLICA: "sb_publishable_yEjdss-ewg3nuabyLlx_Uw_CmDTEt_g",
 
   // Aviso no celular pelo app ntfy (opcional). Ex.: "motalanches-pedidos-7391"
-  NTFY_TOPICO: ""
+  NTFY_TOPICO: "",
+
+  // ---- Lembrete da mensalidade do site (aparece só no painel da loja) ----
+  // Aparece alguns dias antes do vencimento e some sozinho depois.
+  MENSALIDADE: {
+    ATIVO: true,             // true = mostrar o lembrete
+    DIA_VENCIMENTO: 21,      // dia do mês em que vence
+    VALOR: 50.00,            // valor da mensalidade
+    AVISAR_DIAS_ANTES: 2,    // começa a avisar quantos dias antes
+    AVISAR_DIAS_DEPOIS: 5,   // continua avisando quantos dias depois (atrasada)
+    CHAVE_PIX: "16994253489", // sua chave Pix para receber
+    NOME: "Cristian de Freitas Pereira", // seu nome (aparece junto da chave)
+    WHATSAPP: "5516994253489" // seu WhatsApp: 55 + DDD + número (opcional)
+  }
 };

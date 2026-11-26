@@ -1,0 +1,12 @@
+# Proteções extras do site (lidas pela Cloudflare)
+/*
+  X-Frame-Options: DENY
+  Content-Security-Policy: frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Strict-Transport-Security: max-age=31536000
+
+/admin.html
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
